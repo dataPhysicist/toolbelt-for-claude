@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone *)",
+      "Bash(gh auth *)",
+      "Bash(gh api *)"
+    ]
+  }
+}
