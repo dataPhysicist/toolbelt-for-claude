@@ -1,0 +1,23 @@
+{
+  "_comment": "Example of the BRANDED operator catalog the marketplace generator emits for Sterling. The customer adds this marketplace, installs 'sterling-workspace', and the baked-in TOOLBELT_INVITE routes them into Sterling's governed org (State C). To Sterling's brand it says Sterling; Apexti is the quiet 'powered by' mark.",
+  "name": "sterling-ai",
+  "owner": { "name": "Sterling IT Solutions", "email": "ops@sterlingitsolutions.tech" },
+  "plugins": [
+    {
+      "name": "sterling-workspace",
+      "source": { "source": "github", "repo": "sterling-ai/catalog" },
+      "description": "Your Sterling-managed AI workspace inside Claude.",
+      "version": "0.1.0",
+      "strict": false,
+      "skills": ["./skills/get-started/"],
+      "agents": ["./agents/onboarding-guide.md"],
+      "mcpServers": {
+        "toolbelt": {
+          "url": "https://toolbelt.apexti.com/mcp",
+          "transport": "http",
+          "userConfig": { "TOOLBELT_INVITE": "sterling-org-7f3a" }
+        }
+      }
+    }
+  ]
+}

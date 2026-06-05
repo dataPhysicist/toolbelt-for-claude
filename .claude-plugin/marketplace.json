@@ -1,0 +1,11 @@
+{
+  "name": "apexti-toolbelt",
+  "owner": { "name": "Apexti", "email": "nate@apexti.com" },
+  "plugins": [
+    {
+      "name": "toolbelt",
+      "source": "./plugins/toolbelt-get-started",
+      "description": "Connect Claude to your governed Toolbelt org — set up assistants, services, and playbooks in one conversation."
+    }
+  ]
+}

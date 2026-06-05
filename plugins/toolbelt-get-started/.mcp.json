@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "toolbelt": {
+      "url": "https://toolbelt.apexti.com/mcp",
+      "transport": "http"
+    }
+  }
+}
