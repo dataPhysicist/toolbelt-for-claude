@@ -19,7 +19,7 @@ in Toolbelt, not in chat.
 On first run the plugin connects to Toolbelt, lists your org's agents, and tells you to just ask —
 it delegates each request to the best-fit agent and returns that agent's answer.
 
-For the **desktop app**, see [`DESKTOP.md`](./DESKTOP.md) (custom connector + Project, or plugin install).
+For the **desktop app**, see [`DESKTOP.md`](./DESKTOP.md) — install from your marketplace first; connector + Project is a fallback.
 
 ## What's inside
 

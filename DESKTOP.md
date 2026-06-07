@@ -1,37 +1,39 @@
-# Running the Toolbelt first-run in the Claude **desktop app**
+# Running the Toolbelt plugin in the Claude **desktop app**
 
-This version uses a **remote** Toolbelt connector (OAuth, no local process), so it works in the
-desktop app — unlike the original local-stub build, which needed Node.
+Lead with the **marketplace** — that's the real product path and what an operator's customers will use.
+Connector + Project is a break-glass fallback only.
 
 ## You need
-- The exact **Toolbelt remote MCP URL** (and whether it's OAuth or token), copied from Toolbelt's
-  "Connect to Claude / MCP" settings. The plugin currently points at
-  `https://toolbelt.apexti.com/mcp` — **verify and replace this if your endpoint differs**, then
-  re-push the repo.
+- The exact **Toolbelt remote MCP URL** from Toolbelt's "Connect to Claude / MCP" settings (the plugin
+  currently points at `https://toolbelt.apexti.com/mcp` — verify/replace and re-push if it differs).
 - A Toolbelt account to authorize on first connect.
 
-## Route A — Custom connector + Project instructions (most reliable for an individual)
-1. Desktop app → **Settings → Connectors → Add custom connector**.
-2. Paste the Toolbelt remote MCP URL → **Authorize** (sign in to Toolbelt). The Toolbelt tools
-   (`list_assistants`, `create_assistant`, `get_service_connect_url`, …) are now available in chat.
-3. Create a **Project**, and paste the contents of
-   `plugins/toolbelt-get-started/skills/get-started/SKILL.md` (everything below the front-matter)
-   into the Project's **custom instructions**.
-4. In that Project, say **"set up Toolbelt"** → the guided genesis/returning/consumer flow runs
-   against live Toolbelt.
-
-## Route B — Install the plugin (if your desktop has plugin/marketplace support)
-Plugin + marketplace support reached Cowork in 2026; availability of *custom* marketplaces may depend
-on your plan / admin settings (Team & Enterprise admins can add private marketplaces).
-1. Desktop app → **Settings → Plugins** (or the plugin manager) → **Add marketplace** →
+## Route 1 — Install from your marketplace (preferred)
+1. Desktop app → **Settings → Plugins** (plugin manager) → **Add marketplace** →
    `YOUR_GITHUB_USERNAME/toolbelt-claude-marketplace`.
-2. Install the **toolbelt** plugin → authorize the Toolbelt connector when prompted.
-3. Start the flow with the **get-started** skill (e.g. `/toolbelt:get-started`, or say "set up Toolbelt").
+2. Install the **toolbelt** plugin → **authorize** the Toolbelt connector when prompted (this is where
+   your org is established).
+3. Start the flow: say **"connect Toolbelt"** or run **`/toolbelt:get-started`**. It lists your org's
+   agents and delegates your requests to them.
 
-> If your desktop build doesn't expose custom marketplaces, use Route A — it delivers the same
-> experience without depending on plugin-marketplace availability.
+> If your desktop build doesn't expose **custom** marketplaces (it can be plan/admin-gated — Team &
+> Enterprise admins manage private marketplaces), either run the marketplace in **Claude Code** (where
+> `/plugin marketplace add` always works for any user) or use Route 2 below.
+
+## Route 2 — Custom connector + Project (break-glass fallback only)
+Use only if you can't add the marketplace on your desktop build.
+1. Settings → **Connectors → Add custom connector** → paste the Toolbelt MCP URL → **Authorize**.
+2. Create a **Project** and paste the body of
+   `plugins/toolbelt-get-started/skills/get-started/SKILL.md` into its custom instructions.
+3. Say **"connect Toolbelt"** → same connect → list agents → delegate experience.
+
+## Guaranteed marketplace path (any user) — Claude Code
+```text
+/plugin marketplace add YOUR_GITHUB_USERNAME/toolbelt-claude-marketplace
+/plugin install toolbelt@apexti-toolbelt
+/toolbelt:get-started
+```
 
 ## Note on "fresh instance"
-Because a connector + Project is account-level, the cleanest "new user" test is a Project you haven't
-used before (or a separate Claude profile). The genesis path will create a real starter assistant in
-your Toolbelt org — name it clearly (e.g. prefix `ZZ-`) so it's easy to remove afterward.
+A connector/plugin is account-level. The cleanest "new user" test is a **Project** you haven't used
+before (or a separate Claude profile), so the org's agent roster is the only context in the room.
