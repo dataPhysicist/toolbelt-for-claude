@@ -3,12 +3,15 @@
  * Build a per-org branded .mcpb so it shows up named in Claude's Settings list
  * (the list label is the manifest `display_name`, which is static per build).
  *
- *   node pack-org.mjs --org "Acme Corp" [--workspace <id>] [--out Acme.mcpb]
+ *   node pack-org.mjs --org "Acme Corp" [--workspace <id>] [--pin "CoS,Meeting-Prep"] [--out Acme.mcpb]
  *
  * --org        Required. Stamped into display_name ("Toolbelt — Acme Corp") and baked
  *              into TOOLBELT_ORG_NAME (so the install no longer asks for it).
  * --workspace  Optional. Bakes the hub workspace ID into the endpoint so the user only
  *              enters their API key at install.
+ * --pin        Optional. Comma-separated agent names to pre-pin as ask_<name> tools
+ *              (baked into TOOLBELT_PINNED_AGENTS) so the customer's key agents are
+ *              one-click on first launch — no in-chat setup needed.
  * --out        Optional output filename (default: <slug>.mcpb).
  *
  * Requires `npm install` to have run in this folder (the bundled SDK is packed in).
@@ -39,6 +42,10 @@ delete m.user_config.toolbelt_org_name; // …so it isn't asked at install
 if (opt.workspace) {
   m.server.mcp_config.env.TOOLBELT_MCP_URL = `https://toolbelt.apexti.com/api/workspaces/${opt.workspace}/mcp`;
   delete m.user_config.toolbelt_workspace_id; // baked in → only the API key remains
+}
+if (opt.pin) {
+  m.server.mcp_config.env.TOOLBELT_PINNED_AGENTS = opt.pin; // pre-pin favorites
+  delete m.user_config.toolbelt_pinned_agents; // …so it isn't asked at install
 }
 
 try {
