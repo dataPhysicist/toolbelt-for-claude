@@ -59,6 +59,15 @@ anything you share. You **must** supply the routing context yourself (next step)
    `sleep`/`get_pending_sub_chats` guidance.)
 3. Inside that Project, say **"connect Toolbelt"**.
 
+> **For best results — create a Cowork Project per assistant.** Whenever you add a Toolbelt assistant,
+> create a dedicated **Project** in Cowork mode for it. Send this as your **first prompt** in the Project:
+>
+> *"Read the assistant instructions of the connector named `<toolbelt assistant name>` and update your
+> instructions, CLAUDE.md, so we best utilize this assistant in this project."*
+>
+> This seeds the Project's CLAUDE.md with the assistant's purpose, tools, and constraints so Claude routes
+> and collaborates effectively across sessions — without you re-explaining context each time.
+
 ---
 
 ## ⚠️ Never commit your API key
