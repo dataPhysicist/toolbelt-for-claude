@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "toolbelt",
   "display_name": "Toolbelt — Use Your Org's Agents",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Connect Claude to your governed Toolbelt org, pick the optimal model per task, and route work to its agents. Bundles the router behavior so there's nothing to paste.",
   "author": {
     "name": "Apexti",
@@ -16,12 +16,19 @@
       "command": "node",
       "args": ["${__dirname}/bridge.js"],
       "env": {
+        "TOOLBELT_ORG_NAME": "${user_config.toolbelt_org_name}",
         "TOOLBELT_MCP_URL": "https://toolbelt.apexti.com/api/workspaces/${user_config.toolbelt_workspace_id}/mcp",
         "TOOLBELT_API_KEY": "${user_config.toolbelt_api_key}"
       }
     }
   },
   "user_config": {
+    "toolbelt_org_name": {
+      "type": "string",
+      "title": "Org name",
+      "description": "A friendly name for this Toolbelt org (e.g. your company). Claude uses it to refer to your org and helps you tell multiple Toolbelt connections apart.",
+      "required": false
+    },
     "toolbelt_workspace_id": {
       "type": "string",
       "title": "Hub workspace (assistant) ID",

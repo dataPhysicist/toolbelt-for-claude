@@ -23,7 +23,8 @@ Your key is stored in the **OS keychain** and sent as an `Authorization: Bearer`
    select the `desktop-extension/` folder.
    *(To share it as one double-click file instead: `npx @anthropic-ai/mcpb pack` → distribute the
    resulting `toolbelt.mcpb` → users pick **Install Extension**.)*
-3. When prompted, enter your **hub workspace ID** and **Toolbelt API key**.
+3. When prompted, enter an **org name** (optional label, e.g. your company), your **hub workspace ID**,
+   and your **Toolbelt API key**.
 4. Add the routing instructions to a **Project** (see below), then say **"connect Toolbelt"**.
 
 ## Path B (quickest) — add a Custom Connector

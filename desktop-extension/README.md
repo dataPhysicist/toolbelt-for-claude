@@ -38,7 +38,7 @@ Claude Desktop ──stdio──> bridge.js ──HTTPS + Bearer──> toolbelt
 2. Claude Desktop → **Settings → Extensions → Extension Developer → Install Unpacked Extension** →
    select this folder. (Folder picker greys out files — select the **folder**, or package a `.mcpb` and
    use **Install Extension**; see below.)
-3. Enter your **hub workspace ID** and **API key** when prompted.
+3. Enter an **org name** (optional label), your **hub workspace ID**, and **API key** when prompted.
 4. Say **"connect Toolbelt"** (or run `>>toolbelt` first to load the full guidance).
 
 ## Package (.mcpb — for distribution / a clean Install Extension flow)

@@ -40,8 +40,17 @@ if (!MCP_URL || !API_KEY) {
   process.exit(1);
 }
 
+// Optional org label (set at install). Ignore an empty or unsubstituted value.
+let ORG_NAME = (process.env.TOOLBELT_ORG_NAME || "").trim();
+if (!ORG_NAME || ORG_NAME.includes("${")) ORG_NAME = "";
+
 // Router guidance — used for BOTH the bundled prompt and server `instructions`.
-const ROUTER_INSTRUCTIONS = readFileSync(join(HERE, "router-instructions.md"), "utf8");
+// If an org name was provided, lead with it so Claude refers to the org by name.
+const ORG_HEADER = ORG_NAME
+  ? `> This connection is the **${ORG_NAME}** Toolbelt org. Refer to it by that name ` +
+    `(e.g. "your ${ORG_NAME} agents") in greetings and attributions.\n\n`
+  : "";
+const ROUTER_INSTRUCTIONS = ORG_HEADER + readFileSync(join(HERE, "router-instructions.md"), "utf8");
 
 // --- (1) Tool-description rewrites applied on passthrough ---------------------
 const TOOL_OVERRIDES = {
