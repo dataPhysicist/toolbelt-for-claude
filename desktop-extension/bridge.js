@@ -56,12 +56,15 @@ const TOOL_OVERRIDES = {
 const rewriteTool = (tool) =>
   TOOL_OVERRIDES[tool.name] ? { ...tool, description: TOOL_OVERRIDES[tool.name] } : tool;
 
-// Tools that lure the router off-path. The router only needs to read rules,
-// list assistants, and delegate — these are org build-time concerns done in
-// Toolbelt, not prerequisites for delegating. Hidden from the model's surface.
-const HIDDEN_TOOLS = new Set([
-  "manage_assistant_connections", // request/approve persistent connections — NOT needed to delegate
-  "manage_workflows", // multi-assistant workflow authoring — not a routing action
+// The router needs only a handful of tools: read the org rules, list assistants,
+// and delegate. Everything else Toolbelt exposes (storage writes, duckdb, wrenches,
+// service tools, connection/workflow setup, …) is hidden so the model can't wander.
+// To let the router do more, add a tool name here.
+const ALLOWED_TOOLS = new Set([
+  "toolbelt", // dispatcher — provides the list_assistants action (no standalone tool exists)
+  "toolbelt_help", // discover exact toolbelt action names/params
+  "manage_delegations", // delegate (create) + retrieve (wait/status by correlationId)
+  "read_storage_file", // load the org's ModelAutoPilot.md model rules
 ]);
 
 // --- (2) Bundled prompt ------------------------------------------------------
@@ -103,7 +106,7 @@ const server = new Server(
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   await ensureUpstream();
   const { tools = [] } = await upstream.listTools();
-  return { tools: tools.filter((t) => !HIDDEN_TOOLS.has(t.name)).map(rewriteTool) };
+  return { tools: tools.filter((t) => ALLOWED_TOOLS.has(t.name)).map(rewriteTool) };
 });
 
 server.setRequestHandler(CallToolRequestSchema, async (req) => {

@@ -18,8 +18,9 @@ You connect, see your agents, pick the right model for each task, and delegate.
    org-specific rules. If it's missing or org storage is disabled, the org hasn't published Auto-Pilot
    rules → **skip model selection** and let each agent use its own configured model. Don't fail; just
    note rules weren't found and proceed.
-3. Call `list_assistants` to get the org's agents. Show a short roster (name + one line each). Tell the
-   user they can just ask, and you'll route to the right agent on the best model.
+3. Get the org's agents — `list_assistants` is an **action of the `toolbelt` tool**, not a standalone
+   tool: call `toolbelt { action: "list_assistants" }`. Show a short roster (name + one line each). Tell
+   the user they can just ask, and you'll route to the right agent on the best model.
 
 ## To handle a request — optimize the model, then delegate
 Two decisions per request: **which agent** (from the roster) and **which model** that agent should run

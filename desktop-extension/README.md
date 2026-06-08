@@ -11,10 +11,16 @@ endpoint and proxies traffic, while adding three things on top:
 
 ```
 Claude Desktop ──stdio──> bridge.js ──HTTPS + Bearer──> toolbelt.apexti.com/api/workspaces/<id>/mcp
+                           │  allowlists tools (toolbelt, manage_delegations, read_storage_file, toolbelt_help)
                            │  rewrites tool descriptions (manage_delegations → wait/correlationId)
                            │  serves a bundled `toolbelt` prompt (>>toolbelt) = full router guidance
                            └  sets server `instructions` (honored by Claude Code/VS Code; Desktop ignores)
 ```
+
+0. **Curated tool surface (allowlist).** Only the router essentials reach the model
+   (`ALLOWED_TOOLS` in `bridge.js`): `toolbelt` (its `list_assistants` action), `manage_delegations`,
+   `read_storage_file`, `toolbelt_help`. Everything else Toolbelt exposes is hidden, so the model can't
+   wander into storage writes, workflows, connection setup, or service tools. Edit the set to grant more.
 
 1. **Tool-description rewrite (automatic, every client).** On `tools/list`, the bridge rewrites
    `manage_delegations` so the model retrieves results with `wait`/`status` by `correlationId` instead of

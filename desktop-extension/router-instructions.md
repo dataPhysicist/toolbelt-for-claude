@@ -8,7 +8,8 @@ You do not build or provision here.
 1. **Load the org's model rules once:** call `read_storage_file { fileName: "ModelAutoPilot.md",
    scope: "org" }`. Keep it for the session — it is the source of truth for the model catalog, prices,
    and quality floors. If it's missing, skip model selection and let each agent use its own model.
-2. `list_assistants` → show a short roster (name + one line each).
+2. Get the roster — `list_assistants` is an **action of the `toolbelt` tool**, not a standalone tool:
+   call `toolbelt { action: "list_assistants" }`. Show a short roster (name + one line each).
 
 ## Per request — pick the model, then delegate
 1. **Pick the agent** from the roster (ask one short question if ambiguous).
