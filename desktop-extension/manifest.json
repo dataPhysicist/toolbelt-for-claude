@@ -1,0 +1,42 @@
+{
+  "manifest_version": "0.3",
+  "name": "toolbelt",
+  "display_name": "Toolbelt — Use Your Org's Agents",
+  "version": "0.5.0",
+  "description": "Connect Claude to your governed Toolbelt org and route work to its agents. Claude is the front door; Toolbelt is the brain.",
+  "author": {
+    "name": "Apexti",
+    "url": "https://apexti.com/toolbelt"
+  },
+  "homepage": "https://apexti.com/toolbelt",
+  "server": {
+    "type": "node",
+    "entry_point": "node_modules/mcp-remote/dist/proxy.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/node_modules/mcp-remote/dist/proxy.js",
+        "https://toolbelt.apexti.com/api/workspaces/${user_config.toolbelt_workspace_id}/mcp",
+        "--transport",
+        "http-first",
+        "--header",
+        "Authorization: Bearer ${user_config.toolbelt_api_key}"
+      ]
+    }
+  },
+  "user_config": {
+    "toolbelt_workspace_id": {
+      "type": "string",
+      "title": "Hub workspace (assistant) ID",
+      "description": "Your Toolbelt hub workspace (assistant) ID — the agent whose endpoint lists your org roster and routes work.",
+      "required": true
+    },
+    "toolbelt_api_key": {
+      "type": "string",
+      "title": "Toolbelt API key",
+      "description": "Your Toolbelt API key. Stored in your OS keychain (sensitive); never written to the repo and never sent in a URL.",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}
