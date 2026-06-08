@@ -11,22 +11,25 @@ and proxies traffic, adding:
 
 ```
 Claude Desktop ──stdio──> bridge.js ──HTTPS + Bearer──> toolbelt.apexti.com/api/workspaces/<id>/mcp
-   │  one ask_<agent> tool per org assistant (toggle agents on/off; delegate→wait handled internally)
-   │  curated core tools (read_storage_file, toolbelt, toolbelt_help, manage_delegations) — rest hidden
-   │  manage_delegations description rewritten (prefer ask_<agent>; wait/correlationId, never sleep)
-   │  bundled `toolbelt` prompt (>>toolbelt) = full router guidance
-   └  server `instructions` (honored by Claude Code/VS Code; Desktop ignores)
+   │  one ask_<agent> tool per org assistant, recent-first (toggle on/off; delegate→wait handled inside)
+   │  check_agent_result (poll a long job by correlationId) · read_storage_file (Model Auto-Pilot rules)
+   │  toolbelt + toolbelt_help kept for ad-hoc org management (manage_delegations + the rest hidden)
+   │  progress notifications while waiting · auto-reconnect if the session drops · tools/list_changed
+   │  bundled `toolbelt` prompt (>>toolbelt) + server `instructions` (Code/VS Code honor; Desktop ignores)
 ```
 
-1. **Per-agent tools.** At connect, the bridge calls `list_assistants` and surfaces each agent as its own
-   **`ask_<name>`** tool (friendly name; description = the agent's purpose). The user can **toggle
-   individual agents on/off** in Settings → Extensions. Calling `ask_<agent>({ task, model? })` runs the
-   `create → wait` delegation internally and returns the agent's answer — no correlationId handling for
-   the model. If the roster can't be parsed, it falls back to exposing `manage_delegations`.
-2. **Curated surface.** Only the core tools above pass through; storage writes, `duckdb_*`, `wrench_*`,
-   service tools, and connection/workflow setup are hidden so the model can't wander.
-3. **Org name.** Optional `Org name` field at install; if left blank the router learns it at runtime via
-   `toolbelt list_organizations`. Used so Claude refers to your org by name.
+1. **Per-agent tools (recent-first).** At connect, the bridge calls `list_assistants`, sorts by last
+   activity, and surfaces **all** agents as `ask_<name>` tools — toggle individual agents on/off in
+   Settings → Extensions. `ask_<agent>({ task, model? })` runs `create → wait` internally, emits **progress
+   notifications** while waiting (so long jobs don't time out), and returns the answer. If it's still
+   running, it hands back a `correlationId` for **`check_agent_result`**.
+2. **Curated, but management stays available.** Exposed: the `ask_<agent>` tools, `check_agent_result`,
+   `read_storage_file`, and `toolbelt`/`toolbelt_help` (ad-hoc org management). `manage_delegations`,
+   storage writes, `duckdb_*`, `wrench_*`, service tools, and connection/workflow setup are hidden.
+3. **Resilient.** Auto-reconnects if the upstream session drops (retry-once); refreshes the roster every
+   few minutes and emits `tools/list_changed` when agents are added/removed; clear message on a 401.
+4. **Org name.** Optional `Org name` field at install; if blank the bridge learns it from
+   `list_organizations`. Used so Claude refers to your org by name.
 
 ## Install (single-file .mcpb — recommended)
 ```bash
@@ -46,9 +49,11 @@ node pack-org.mjs --org "Acme Corp" --workspace <hub-workspace-id>   # → acme-
 - Bakes the org name and (with `--workspace`) the workspace ID, so the user only enters their **API key**.
 - Restores the base `manifest.json` afterward. Omit `--workspace` to keep that field at install.
 
-## Status
-- Verified locally: bridge handshake, `instructions` + bundled prompt, org-name injection, graceful
-  upstream failure; helper/slug logic; the `pack-org.mjs` generator (branded manifest + restore).
-- **Needs a live test:** the per-agent tool generation, delegation, and roster parse against a real
-  Toolbelt endpoint with your key. Watch `[toolbelt-bridge]` logs; if the roster doesn't parse it falls
-  back to `manage_delegations` (still functional).
+## Status (v0.10)
+- **Verified locally:** downstream handshake, bundled prompt, graceful upstream failure; the roster
+  transform against real org data (recent-first ordering, slug names, collision handling); the
+  session/auth error classifiers; packaging (`.mcpbignore` excludes `pack-org.mjs`/README; icon + node
+  compatibility in the manifest).
+- **Needs a live test (your key):** the delegation round-trip (`create → wait → responseContent`),
+  `check_agent_result`, progress-notification rendering, and reconnect after a real session drop. Watch
+  `[toolbelt-bridge]` logs; if the roster can't be parsed it falls back to the core tools (still usable).
