@@ -1,9 +1,9 @@
 {
   "manifest_version": "0.3",
-  "name": "toolbelt",
-  "display_name": "Toolbelt — Use Your Org's Agents",
-  "version": "0.11.0",
-  "description": "Connect Claude to your governed Toolbelt org, pick the optimal model per task, and route work to its agents. Bundles the router behavior so there's nothing to paste.",
+  "name": "toolbelt-agent",
+  "display_name": "Toolbelt — Agent",
+  "version": "0.12.0",
+  "description": "Bring one governed Toolbelt agent — its tools, wrenches/playbooks, and persona — into Claude. One extension = one agent.",
   "author": {
     "name": "Apexti",
     "url": "https://apexti.com/toolbelt"
@@ -23,30 +23,23 @@
       "command": "node",
       "args": ["${__dirname}/bridge.js"],
       "env": {
-        "TOOLBELT_ORG_NAME": "${user_config.toolbelt_org_name}",
-        "TOOLBELT_PINNED_AGENTS": "${user_config.toolbelt_pinned_agents}",
+        "TOOLBELT_AGENT_NAME": "${user_config.toolbelt_agent_name}",
         "TOOLBELT_MCP_URL": "https://toolbelt.apexti.com/api/workspaces/${user_config.toolbelt_workspace_id}/mcp",
         "TOOLBELT_API_KEY": "${user_config.toolbelt_api_key}"
       }
     }
   },
   "user_config": {
-    "toolbelt_org_name": {
+    "toolbelt_agent_name": {
       "type": "string",
-      "title": "Org name",
-      "description": "A friendly name for this Toolbelt org (e.g. your company). Optional — if blank, Claude learns it automatically. Helps you tell multiple Toolbelt connections apart.",
-      "required": false
-    },
-    "toolbelt_pinned_agents": {
-      "type": "string",
-      "title": "Pinned agents (optional)",
-      "description": "Optional comma-separated agent names to pre-pin as one-click ask_<name> tools (e.g. \"Chief-of-Staff, Meeting-Prep\"). Leave blank to choose them in-chat after install. You can re-pin anytime by asking Claude.",
+      "title": "Agent name",
+      "description": "A friendly name for this agent (e.g. Chief-of-Staff). Optional — Claude learns it automatically. Used to name the act_as_<agent> prompt.",
       "required": false
     },
     "toolbelt_workspace_id": {
       "type": "string",
-      "title": "Hub workspace (assistant) ID",
-      "description": "Your Toolbelt hub workspace (assistant) ID — the agent whose endpoint lists your org roster and routes work.",
+      "title": "Agent workspace ID",
+      "description": "The Toolbelt workspace ID of the assistant you want in Claude. Its tools, wrenches, and persona are brought in.",
       "required": true
     },
     "toolbelt_api_key": {
