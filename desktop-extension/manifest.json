@@ -2,8 +2,8 @@
   "manifest_version": "0.3",
   "name": "toolbelt",
   "display_name": "Toolbelt — Use Your Org's Agents",
-  "version": "0.5.0",
-  "description": "Connect Claude to your governed Toolbelt org and route work to its agents. Claude is the front door; Toolbelt is the brain.",
+  "version": "0.7.0",
+  "description": "Connect Claude to your governed Toolbelt org, pick the optimal model per task, and route work to its agents. Bundles the router behavior so there's nothing to paste.",
   "author": {
     "name": "Apexti",
     "url": "https://apexti.com/toolbelt"
@@ -11,17 +11,14 @@
   "homepage": "https://apexti.com/toolbelt",
   "server": {
     "type": "node",
-    "entry_point": "node_modules/mcp-remote/dist/proxy.js",
+    "entry_point": "bridge.js",
     "mcp_config": {
       "command": "node",
-      "args": [
-        "${__dirname}/node_modules/mcp-remote/dist/proxy.js",
-        "https://toolbelt.apexti.com/api/workspaces/${user_config.toolbelt_workspace_id}/mcp",
-        "--transport",
-        "http-first",
-        "--header",
-        "Authorization: Bearer ${user_config.toolbelt_api_key}"
-      ]
+      "args": ["${__dirname}/bridge.js"],
+      "env": {
+        "TOOLBELT_MCP_URL": "https://toolbelt.apexti.com/api/workspaces/${user_config.toolbelt_workspace_id}/mcp",
+        "TOOLBELT_API_KEY": "${user_config.toolbelt_api_key}"
+      }
     }
   },
   "user_config": {
@@ -34,7 +31,7 @@
     "toolbelt_api_key": {
       "type": "string",
       "title": "Toolbelt API key",
-      "description": "Your Toolbelt API key. Stored in your OS keychain (sensitive); never written to the repo and never sent in a URL.",
+      "description": "Your Toolbelt API key. Stored in your OS keychain (sensitive); sent as an Authorization: Bearer header, never in a URL.",
       "sensitive": true,
       "required": true
     }

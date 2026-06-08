@@ -1,52 +1,50 @@
 # Toolbelt — Claude Desktop Extension (.mcpb)
 
-A native **Claude Desktop** install for the Toolbelt router. Unlike the custom-connector path, this
-stores your API key in the **OS keychain**, prompts for your workspace ID + key at install, and never
-puts the key in a URL.
+A native **Claude Desktop** install for the Toolbelt router. Stores your API key in the **OS keychain**,
+sends it as an `Authorization: Bearer` header (never in a URL), and **carries the router behavior itself**
+so there's (almost) nothing to paste.
 
-## How it works
-Desktop Extensions (MCPB) run a **local stdio** server — there is no remote-HTTP server type. So this
-extension bundles [`mcp-remote`](https://www.npmjs.com/package/mcp-remote), a tiny stdio↔HTTP bridge that
-forwards Claude's MCP traffic to Toolbelt's remote endpoint and injects your key as an
-`Authorization: Bearer` header. Your `manifest.json` declares two `user_config` fields; Desktop collects
-them (the key marked `sensitive` → keychain) and substitutes them into the bridge's arguments at launch.
+## How it works — a thin local bridge (`bridge.js`)
+Desktop Extensions run a **local stdio** server; there's no remote-HTTP server type. So `bridge.js` is a
+small MCP server (built on `@modelcontextprotocol/sdk`) that connects *out* to the remote Toolbelt MCP
+endpoint and proxies traffic, while adding three things on top:
 
 ```
-Claude Desktop  ──stdio──>  mcp-remote (local, bundled)  ──HTTPS + Bearer──>  toolbelt.apexti.com/.../mcp
+Claude Desktop ──stdio──> bridge.js ──HTTPS + Bearer──> toolbelt.apexti.com/api/workspaces/<id>/mcp
+                           │  rewrites tool descriptions (manage_delegations → wait/correlationId)
+                           │  serves a bundled `toolbelt` prompt (>>toolbelt) = full router guidance
+                           └  sets server `instructions` (honored by Claude Code/VS Code; Desktop ignores)
 ```
+
+1. **Tool-description rewrite (automatic, every client).** On `tools/list`, the bridge rewrites
+   `manage_delegations` so the model retrieves results with `wait`/`status` by `correlationId` instead of
+   the built-in `sleep`/`get_pending_sub_chats` that fail for an external client. This is the key fix and
+   needs no user action. See `TOOL_OVERRIDES` in `bridge.js`.
+2. **Bundled prompt.** `>>toolbelt` (or the prompt menu) inserts the full router guidance from
+   `router-instructions.md` — replaces pasting a skill file into a Project.
+3. **Server `instructions`.** Best-effort hint; injected by clients that support it. *Verified: Claude
+   Desktop does **not** inject it* (see the probe in `../experiments/instructions-probe/`), which is why
+   #1 and #2 carry the behavior instead.
 
 ## Install (unpacked — for testing today)
-The `node_modules/` with the bundled bridge must be present (run `npm install` here if it isn't).
+`node_modules/` (the SDK) must be present.
+1. `cd desktop-extension && npm install`
+2. Claude Desktop → **Settings → Extensions → Extension Developer → Install Unpacked Extension** →
+   select this folder. (Folder picker greys out files — select the **folder**, or package a `.mcpb` and
+   use **Install Extension**; see below.)
+3. Enter your **hub workspace ID** and **API key** when prompted.
+4. Say **"connect Toolbelt"** (or run `>>toolbelt` first to load the full guidance).
 
-1. Claude Desktop → **Settings → Extensions → Extension Developer → Install Unpacked Extension**
-2. Select this `desktop-extension/` folder.
-3. When prompted, enter your **hub workspace ID** and **Toolbelt API key**.
-4. Open a chat and say **"connect Toolbelt"** (pair with a Project that holds the routing instructions —
-   see "Routing behavior" below).
-
-## Package (.mcpb — for distribution)
-To produce a single double-click installable file:
+## Package (.mcpb — for distribution / a clean Install Extension flow)
 ```bash
-npm install            # vendor the bridge into node_modules/
-npx @anthropic-ai/mcpb pack      # or: mcpb pack  — produces toolbelt.mcpb (bundles node_modules)
+npm install            # vendor the SDK into node_modules/
+npx @anthropic-ai/mcpb pack   # → toolbelt-0.7.0.mcpb (bundles node_modules)
 ```
-Share the resulting `toolbelt.mcpb`; users install it via **Settings → Extensions → Install Extension**.
+Distribute the `.mcpb`; users install via **Settings → Extensions → Install Extension** (single file → a
+normal Open button).
 
-## Routing behavior (important)
-This extension provides the **tools** (`list_assistants`, `manage_delegations`, …) but does **not**
-auto-apply the router skill. The delegation discipline — use `manage_delegations action:"create"` →
-`action:"wait"` keyed by `correlationId`, and **not** `sleep`/`get_pending_sub_chats` (which need a chat
-context an external client lacks) — lives in `../plugins/toolbelt-get-started/skills/get-started/SKILL.md`.
-On Desktop, paste that file's body into a **Project's custom instructions** and use the extension inside
-that Project. (A future version can bundle a custom proxy that exposes this as an MCP prompt.)
-
-## Auth wiring note
-The key is substituted directly into the `--header` argument via `${user_config.toolbelt_api_key}`. If a
-future Desktop build exposes the launch argv and you'd rather keep the key out of it, switch to the
-env-indirection form: put `"env": { "TOOLBELT_API_KEY": "${user_config.toolbelt_api_key}" }` in
-`mcp_config` and change the header to `"Authorization: Bearer ${TOOLBELT_API_KEY}"` (mcp-remote expands
-`${TOOLBELT_API_KEY}` from the environment).
-
-## Versions
-- Bundled `mcp-remote`: pinned by `package.json` (installed: 0.1.38).
-- Manifest: `manifest_version` 0.3.
+## Status
+- Verified locally: bridge starts, serves `instructions` + the `toolbelt` prompt, and fails gracefully
+  when the upstream is unreachable.
+- **Needs a live test:** upstream proxying + the `manage_delegations` rewrite against a real Toolbelt
+  endpoint with your key. Watch the extension logs on first `list_assistants` / delegation.
