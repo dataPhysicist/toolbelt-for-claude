@@ -1,69 +1,42 @@
-# Toolbelt — Getting Started plugin (P0)
+# Toolbelt — Getting Started plugin (Claude Code)
 
-A thin Claude plugin whose only job is to connect a fresh Claude to a governed **Toolbelt**
-org and run a friendly first-run. All the brains live server-side in the `onboard` tool —
-this plugin just renders the cards the server returns. In **P0** that server is a
-zero-dependency local **stub** so you can feel the experience without touching Toolbelt source.
+The Claude **Code** path for connecting to a governed **Toolbelt** org and using its agents — the
+README's **Method A**. It connects Claude directly to your hub workspace's MCP endpoint and applies the
+router skill automatically. Claude is the front door; Toolbelt is the brain.
 
 ## What's inside
 
 ```
 toolbelt-get-started/
-├── .claude-plugin/plugin.json     # manifest (namespace: /toolbelt:…)
-├── .mcp.json                      # points Claude at the onboard server (stub in P0)
-├── skills/get-started/SKILL.md    # /toolbelt:get-started — the entry point
-├── agents/onboarding-guide.md     # optional focused sub-agent runner
-├── servers/onboard-stub.mjs       # zero-dep MCP stub of the onboard() state machine
-├── examples/sterling-marketplace.json  # branded operator catalog (State C demo)
-└── README.md
+├── .claude-plugin/plugin.json     # manifest + userConfig (workspace id + API key prompts)
+├── .mcp.json                      # remote Toolbelt MCP connector — Authorization: Bearer (no secret in repo)
+├── skills/get-started/SKILL.md    # the router skill (auto-applied): connect → load org rules
+│                                  #   → pick model → delegate by correlationId → honest reporting
+├── agents/onboarding-guide.md     # legacy demo (pre-router) — not wired into the plugin
+├── servers/onboard-stub.mjs       # legacy demo stub (pre-router) — not wired into the plugin
+└── examples/sterling-marketplace.json  # legacy branded-catalog demo (old endpoint)
 ```
 
-## Try it locally (no install)
+## Install (Claude Code)
 
-```bash
-# from the folder that contains toolbelt-get-started/
-claude --plugin-dir ./toolbelt-get-started
-# in Claude:
+```text
+/plugin marketplace add <github-user>/toolbelt-claude-marketplace
+/plugin install toolbelt@apexti-toolbelt
 /toolbelt:get-started
 ```
 
-Walk the three persona paths:
+On install you're prompted for your **hub workspace ID** and **API key** (kept in your keychain via
+`userConfig`, never committed). The skill then connects, loads your org's `ModelAutoPilot.md` rules,
+lists your agents, and delegates each request to the best-fit agent on the optimal model.
 
-- **Genesis** (new operator): at the first card pick `genesis` → it provisions a starter
-  org, connects Gmail, runs a playbook, schedules the report.
-- **Returning** (operator with assistants): pick `returning` → it discovers your assistants
-  and wires the report.
-- **Consumer** (Sterling's customer): simulate the branded install by setting the invite —
-  `TOOLBELT_INVITE=sterling-org-7f3a claude --plugin-dir ./toolbelt-get-started` — then run
-  `/toolbelt:get-started`. It binds you to Sterling's org with no building.
+## On the desktop app
 
-Run `/reload-plugins` after edits to pick up changes.
+The desktop app has no `/plugin` or marketplace. Use a **Custom Connector** (Method A) or the
+**Desktop Extension** (Method B) — see [`../../DESKTOP.md`](../../DESKTOP.md) and the README's
+[Two ways to connect](../../README.md#two-ways-to-connect-toolbelt-agents-to-claude).
 
-## Try the install path (local marketplace)
+## Notes
 
-```text
-/plugin marketplace add /absolute/path/to/toolbelt-marketplace-local.json
-/plugin install toolbelt@toolbelt-local
-```
-
-## Going to production (P1+)
-
-Swap the stub for the real endpoint by editing `.mcp.json` to the remote Toolbelt MCP server:
-
-```json
-{ "mcpServers": { "toolbelt": { "url": "https://toolbelt.apexti.com/mcp", "transport": "http" } } }
-```
-
-Then implement `onboard` in Toolbelt over the existing primitives (`create_assistant`,
-`enable_service`, `get_service_connect_url`, `wrench_execute`, `create_dashboard_page`, …).
-The client does **not** change — only the server. See the Getting-Started plan doc for the
-`onboard` contract, the source enhancements (inline signup OAuth, invite-bound OAuth, starter
-templates), phasing, and the time-to-value metric.
-
-## Notes & caveats
-
-- The stub asks "genesis or returning?" because it can't authenticate you. The **real** server
-  auto-detects persona from your Toolbelt role + inventory; drop that card in production.
-- `.mcp.json` is intentionally minimal. Avoid putting secrets here; real auth is the remote
-  server's OAuth handshake.
-- Keep onboarding tools pre-allowed so users don't face repeated "approve tool?" prompts.
+- `.mcp.json` carries no secret — the API key is collected at install and sent as a Bearer header.
+- The `servers/`, `agents/`, and `examples/` files are **legacy demo artifacts** from an earlier
+  onboarding-stub design; they're not part of the router path and can be removed.

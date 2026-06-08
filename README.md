@@ -106,14 +106,18 @@ reaches Claude and how curated the tools are.
 ## What's inside
 
 ```
-.claude-plugin/marketplace.json          # the marketplace catalog
-plugins/toolbelt-get-started/            # the plugin (v0.6 — router + Model Auto-Pilot)
-  ├── .claude-plugin/plugin.json         # plugin manifest + userConfig (workspace id + API key prompts)
-  ├── .mcp.json                          # per-workspace Toolbelt MCP connector (Bearer-header auth)
-  ├── skills/get-started/SKILL.md        # connect -> load org rules -> pick model -> delegate (correlationId)
-  ├── agents/onboarding-guide.md
-  ├── servers/onboard-stub.mjs           # dev/demo stub only (not the product path)
-  └── examples/sterling-marketplace.json # branded operator catalog (org-pinned)
+.claude-plugin/marketplace.json          # the marketplace catalog (Claude Code)
+plugins/toolbelt-get-started/            # Method A — Claude Code plugin (v0.6, router + Model Auto-Pilot)
+  ├── .claude-plugin/plugin.json         #   manifest + userConfig (workspace id + API key prompts)
+  ├── .mcp.json                          #   per-workspace Toolbelt MCP connector (Bearer-header auth)
+  ├── skills/get-started/SKILL.md        #   the router skill: connect -> rules -> pick model -> delegate
+  └── agents/ · servers/ · examples/     #   legacy onboarding-stub demo (pre-router; not wired in)
+desktop-extension/                       # Method B — Claude Desktop bridge extension (v0.9)
+  ├── bridge.js                          #   local MCP proxy: ask_<agent> tools, curated surface, rewrites
+  ├── router-instructions.md             #   bundled router guidance (prompt + server instructions)
+  ├── manifest.json · package.json       #   MCPB manifest + SDK dependency
+  └── pack-org.mjs                       #   per-org branded build (names it in the Settings list)
+experiments/instructions-probe/          # diagnostic: does a client inject MCP `instructions`?
 ```
 
 ## Connecting (per-workspace endpoint + your API key)
@@ -159,17 +163,21 @@ server-side item (see `docs/claude-integration-roadmap.md` in the Toolbelt repo)
 1. **Router plugin** (this) — connect + list + delegate to the org's agents. ✅ built
 2. **Delegation round-trip** — ✅ working with zero server edits via `manage_delegations` create →
    `wait`/`status` by `correlationId` (the earlier "needs a chat context" blocker is solved client-side).
-3. **Self-contained behavior via a custom MCP bridge** (zero Toolbelt edits) — ✅ built in
-   `desktop-extension/` (`bridge.js`). Replaces `mcp-remote` with a thin SDK-based proxy that carries the
-   router behavior itself: **tool-description rewrites** on passthrough (model sees `wait`/`correlationId`,
-   not the misleading `sleep`/`get_pending_sub_chats`), a **bundled `toolbelt` prompt** (one-action
-   insert), and best-effort server `instructions`.
+3. **Self-contained bridge extension (Method B)** — ✅ built in `desktop-extension/` (`bridge.js`, v0.9).
+   A thin SDK-based proxy (replacing `mcp-remote`) that carries the router behavior itself: **per-agent
+   `ask_<name>` tools** (toggle assistants on/off), a **curated tool surface**, **tool-description
+   rewrites** (model sees `wait`/`correlationId`, not the misleading `sleep`/`get_pending_sub_chats`), a
+   **bundled `toolbelt` prompt** + best-effort server `instructions`, keychain Bearer auth, and an optional
+   **org name**.
    **Probe result (recorded so we don't re-litigate):** Claude Desktop does **not** inject the MCP
-   `instructions` field (the `experiments/instructions-probe/` test connected and the tool worked, but the
-   🍍 directive had no effect). So the bridge relies on the rewrite (automatic) + the prompt (one action),
-   not on auto-injection. *Pending a live test against a real org endpoint.*
-4. **Generator** — auto-emit a branded connector + roster skill per org.
-5. **Optional later** — per-assistant toggle connectors, org-as-Claude-Project templates.
+   `instructions` field (`experiments/instructions-probe/` connected and the tool worked, but the 🍍
+   directive had no effect). So the bridge relies on the rewrite + per-agent tools, not auto-injection.
+   *Pending a live test against a real org endpoint.*
+4. **Per-assistant toggles** — ✅ each org agent is its own `ask_<name>` tool in the bridge (enable/disable
+   individually in Settings).
+5. **Per-org branded build** — ✅ `desktop-extension/pack-org.mjs` stamps the org name into the Settings
+   label and pre-bakes the workspace ID. *(Still future: auto-emitting a per-org roster skill / Project
+   template.)*
 6. **Server-side graduation** — see `docs/claude-integration-roadmap.md` in the Toolbelt repo.
 
 See the EVALUATION and plan docs for the full rationale.
