@@ -2,3 +2,6 @@ node_modules/
 *.log
 .DS_Store
 *.mcpb
+# …except shipped installers
+!dist/*.mcpb
+!plugins/*/skills/*/*.mcpb
