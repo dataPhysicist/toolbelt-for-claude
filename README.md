@@ -40,6 +40,32 @@ never leaves the server.
 | Teamwork | one person's assistant | a roster: agents delegate to each other, and the whole team uses the same ones |
 | Portability | locked to your Claude account | the same agent works in Claude, ChatGPT, Gemini, and Toolbelt itself |
 
+## What makes this design interesting
+
+**Your agents never go stale.** Nothing is copied into Claude — instructions, skills
+(wrenches), files, and memory are fetched live from Toolbelt on every use. Edit an agent
+in Toolbelt and every installed copy, on every machine, behaves differently on the very
+next message. The routing skills auto-update too: push a new version to this repo and
+installed plugins pick it up from the marketplace.
+
+**One question, many models.** Toolbelt agents can spawn sub-chats on OpenAI, Gemini,
+Anthropic, or free Crescent models, picked per task by Model Auto-Pilot — so from inside
+Claude you can route a job to `gpt-5.4-mini`, run research on `gemini-3.5-flash`, or ask
+the *same question to three providers and compare the answers*. Claude is the interface;
+the work runs wherever it runs best.
+
+**No one-way doors.** If you build your business natively on a single AI ecosystem,
+you've signed a lease you can't break: when that vendor raises prices, has an outage, or
+changes terms, your only options are pay up or rebuild everything from scratch. With
+Toolbelt as the brains, your agents — their instructions, workflows, memory, integrations,
+and governance — live in a layer that speaks to *every* provider and *every* interface.
+Claude is a front door you chose, not a foundation you're stuck on. Swap models, mix
+providers, or add ChatGPT and Gemini as additional front doors — nothing gets rebuilt.
+
+**Agents coexist cleanly.** Every agent's tools are namespaced (`cos_*`, `st_*`), so you
+can run your whole roster in one chat without collisions, toggle each agent per
+conversation, and see exactly which agent did what in the tool-call log.
+
 ## How it's packaged: connector + skill, separately
 
 Each agent ships as **two small pieces** that work together:
