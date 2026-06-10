@@ -1,19 +1,10 @@
 {
   "name": "chief-of-staff",
-  "description": "An always-on digital Chief of Staff for founders and executives. Turns a noisy inbox, calendar, and meeting stream into a clear operating picture — email triage, meeting prep, daily briefs, and follow-through. Powered by Apexti (apexti.com).",
-  "version": "2.1.0",
+  "description": "An always-on digital Chief of Staff for founders and executives. Turns a noisy inbox, calendar, and meeting stream into a clear operating picture — email triage, meeting prep, daily briefs, and follow-through. Routing skill — pair with the Chief-of-Staff connector (.mcpb or gateway URL). Powered by Apexti (apexti.com).",
+  "version": "2.2.0",
   "author": {
     "name": "Apexti",
     "url": "https://apexti.com"
   },
-  "homepage": "https://apexti.com",
-  "userConfig": {
-    "toolbelt_api_key": {
-      "type": "string",
-      "title": "Toolbelt API key",
-      "description": "The API key Chief-of-Staff uses to reach its tools and memory (Toolbelt → Settings → Connect to Claude).",
-      "sensitive": true,
-      "required": false
-    }
-  }
+  "homepage": "https://apexti.com"
 }

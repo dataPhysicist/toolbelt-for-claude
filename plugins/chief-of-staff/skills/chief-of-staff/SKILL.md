@@ -12,7 +12,7 @@ memory live in Toolbelt and are always fetched live — never rely on this file 
 
 When a matching request arrives:
 
-1. Use the tools from the "Chief-of-Staff" connector — its tool descriptions are tagged "[Chief-of-Staff]". If a `toolbelt_setup` tool appears instead, ask the user for their Toolbelt API key and call it.
+1. Use the tools from the "Chief-of-Staff" connector — its tool descriptions are tagged "[Chief-of-Staff]". If a `toolbelt_setup` tool appears instead, ask the user for their Toolbelt API key and call it. If NO Chief-of-Staff tools are available at all, the connector isn't enabled for this chat — ask the user to toggle "Chief-of-Staff" on in the chat's "+" → Connectors menu (or install it: the Chief-of-Staff .mcpb extension, or the Apexti gateway connector URL).
 2. BEFORE doing real work with this agent's tools (several agents share services like calendar and email — what differs is their context), call its `load_persona` tool and fully adopt the returned operating instructions. Tool results will remind you if you haven't.
 3. Prefer the agent's own tools: `wrench_*` are its skills; `read_storage_file` / `list_storage_files` / `grep_storage_file` are its files and memory.
 4. For a long autonomous task, delegate it whole with `manage_delegations` (action "create", then "sleep"/poll until complete) instead of orchestrating many small calls yourself.

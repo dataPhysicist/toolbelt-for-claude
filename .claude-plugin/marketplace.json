@@ -13,12 +13,12 @@
     {
       "name": "chief-of-staff",
       "source": "./plugins/chief-of-staff",
-      "description": "An always-on digital Chief of Staff for founders and executives. Turns a noisy inbox, calendar, and meeting stream into a clear operating picture — email triage, meeting prep, daily briefs, and follow-through. Powered by Apexti (apexti.com)."
+      "description": "An always-on digital Chief of Staff for founders and executives. Turns a noisy inbox, calendar, and meeting stream into a clear operating picture — email triage, meeting prep, daily briefs, and follow-through. Routing skill — pair with the Chief-of-Staff connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
     },
     {
       "name": "smart-ticketing",
       "source": "./plugins/smart-ticketing",
-      "description": "A feedback-triage assistant: turns raw bug reports and feature ideas into clean, deduplicated, structured tickets — and keeps the triage board honest. Powered by Apexti (apexti.com)."
+      "description": "A feedback-triage assistant: turns raw bug reports and feature ideas into clean, deduplicated, structured tickets — and keeps the triage board honest. Routing skill — pair with the Smart-Ticketing connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
     }
   ]
 }
