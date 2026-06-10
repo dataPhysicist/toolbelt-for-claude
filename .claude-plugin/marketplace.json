@@ -1,11 +1,19 @@
 {
   "name": "apexti-toolbelt",
-  "owner": { "name": "Apexti", "email": "nate@apexti.com" },
+  "owner": {
+    "name": "Apexti",
+    "email": "nate@apexti.com"
+  },
   "plugins": [
     {
       "name": "toolbelt",
       "source": "./plugins/toolbelt-get-started",
       "description": "Connect Claude to your governed Toolbelt org — set up assistants, services, and playbooks in one conversation."
+    },
+    {
+      "name": "chief-of-staff",
+      "source": "./plugins/chief-of-staff",
+      "description": "An always-on digital Chief of Staff for founders and executives. Turns a noisy inbox, calendar, and meeting stream into a clear operating picture — email triage, meeting prep, daily briefs, and follow-through. Powered by Apexti (apexti.com)."
     }
   ]
 }
