@@ -29,15 +29,15 @@ steps as a wall — guide them):
    "Smart-Ticketing" is toggled ON in the chat's "+" → Connectors menu. Then ask the same
    question again.
 
-If a `toolbelt_setup` tool appears instead of the agent's tools, the connector is
-installed but missing its key — ask for the API key and call `toolbelt_setup` with it.
+If a `st_toolbelt_setup` tool appears instead of the agent's tools, the connector is
+installed but missing its key — ask for the API key and call `st_toolbelt_setup` with it.
 
 When a matching request arrives (and tools are available):
 
-1. Use the tools from the "Smart-Ticketing" connector — its tool descriptions are tagged "[Smart-Ticketing]".
-2. BEFORE doing real work with this agent's tools (several agents share services like calendar and email — what differs is their context), call its `load_persona` tool and fully adopt the returned operating instructions. Tool results will remind you if you haven't.
-3. Prefer the agent's own tools: `wrench_*` are its skills; `read_storage_file` / `list_storage_files` / `grep_storage_file` are its files and memory.
-4. For a long autonomous task, delegate it whole with `manage_delegations` (action "create", then "sleep"/poll until complete) instead of orchestrating many small calls yourself.
+1. Use the tools from the "Smart-Ticketing" connector — they are prefixed `st_` (e.g. `st_get_calendar`) and their descriptions are tagged "[Smart-Ticketing]".
+2. BEFORE doing real work with this agent's tools (several agents share services like calendar and email — what differs is their context), call its `st_load_persona` tool and fully adopt the returned operating instructions. Tool results will remind you if you haven't.
+3. Prefer the agent's own tools: `st_wrench_*` are its skills; `st_read_storage_file` / `st_list_storage_files` / `st_grep_storage_file` are its files and memory.
+4. For a long autonomous task, delegate it whole with `st_manage_delegations` (action "create", then "sleep"/poll until complete) instead of orchestrating many small calls yourself.
 5. Answer in the agent's voice and cite what you used.
 
 ## Staying in sync with Toolbelt
