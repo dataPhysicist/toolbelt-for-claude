@@ -32,18 +32,40 @@ steps as a wall — guide them):
 If a `ea_toolbelt_setup` tool appears instead of the agent's tools, the connector is
 installed but missing its key — ask for the API key and call `ea_toolbelt_setup` with it.
 
-When a matching request arrives (and tools are available):
+## How to reach Engagement-Advisor (check in this order — do NOT skip to delegation)
 
-1. Use the tools from the "Engagement-Advisor" connector — they are prefixed `ea_` (e.g. `ea_get_calendar`) and their descriptions are tagged "[Engagement-Advisor]".
-2. BEFORE doing real work with this agent's tools (several agents share services like calendar and email — what differs is their context), call its `ea_load_persona` tool and fully adopt the returned operating instructions. Tool results will remind you if you haven't.
-3. Prefer the agent's own tools: `ea_wrench_*` are its skills; `ea_read_storage_file` / `ea_list_storage_files` / `ea_grep_storage_file` are its files and memory.
-4. For a long autonomous task, delegate it whole as a sub-chat (below) instead of orchestrating many small calls yourself.
-5. Answer in the agent's voice and cite what you used.
+"Use Engagement-Advisor" means: become Engagement-Advisor and use its tools directly. It does NOT
+mean hand the task to a sub-agent. Resolve access in this order:
 
-## Delegating to other models (sub-chats / Model Auto-Pilot)
+1. **Direct tools (the normal case in Claude Desktop/Cowork).** If tools named
+   `ea_*` (e.g. `ea_load_persona`, `ea_get_calendar`) are available,
+   USE THEM DIRECTLY. Call `ea_load_persona` first to adopt the operating
+   instructions, then do the work with the agent's own tools. This is the primary path —
+   never reach for `manage_delegations` when `ea_*` tools exist.
+2. **No `ea_*` tools yet?** They may be a moment from loading — try once more / a
+   new message. If a generic `manage_delegations` IS available (a Toolbelt-native
+   session) and the `ea_*` tools are not, then delegate to assistant id
+   `08583ebe-041d-4ebe-bc90-706bd7b6c506` via `manage_delegations`.
+3. **Neither available?** The Engagement-Advisor connector isn't loaded for this chat. Tell
+   the user to enable "Engagement-Advisor" in the "+" → Connectors menu (or install it), and
+   stop — don't silently substitute yourself.
 
-Toolbelt runs sub-chats on MANY providers — OpenAI, Gemini, Anthropic, and free Crescent
-models — so work can be routed to the optimal model even though Claude is the front end.
+Once you have the agent (path 1 or 2):
+
+- BEFORE real work, `ea_load_persona` and fully adopt the returned instructions
+  (several agents share services like calendar/email — what differs is their context).
+- Prefer the agent's own tools: `ea_wrench_*` are its skills;
+  `ea_read_storage_file` / `ea_list_storage_files` / `ea_grep_storage_file`
+  are its files and memory.
+- Answer in the agent's voice and cite what you used.
+
+## Delegating to OTHER MODELS (sub-chats / Model Auto-Pilot)
+
+This is a DIFFERENT thing from reaching Engagement-Advisor above. Use it only when the user
+wants the work run on a specific or different model provider (e.g. "use gpt-5.4-mini",
+"compare answers across providers"). Toolbelt runs sub-chats on MANY providers — OpenAI,
+Gemini, Anthropic, and free Crescent models. For ordinary requests, just use the
+`ea_*` tools directly (above) — do not wrap them in a sub-chat.
 
 **Trust Toolbelt's model catalog over your own knowledge.** Model names like
 `gpt-5.4-mini`, `gemini-3.5-flash`, `claude-opus-4-8`, or `crescent-medium` may be
