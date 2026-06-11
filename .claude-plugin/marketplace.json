@@ -19,6 +19,11 @@
       "name": "smart-ticketing",
       "source": "./plugins/smart-ticketing",
       "description": "A feedback-triage assistant: turns raw bug reports and feature ideas into clean, deduplicated, structured tickets — and keeps the triage board honest. Routing skill — pair with the Smart-Ticketing connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
+    },
+    {
+      "name": "health-e",
+      "source": "./plugins/health-e",
+      "description": "Your personal electronic health coaching assistant. Chat-first health coaching grounded in first-principles thinking, authentic nutrition science, and surprising health facts most people were never told. Routing skill — pair with the Health-E connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
     }
   ]
 }
