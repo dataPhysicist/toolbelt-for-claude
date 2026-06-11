@@ -43,5 +43,5 @@ NODE
 ( cd "$work" && zip -qry "$OUT/$slug.mcpb" manifest.json server icon.png )
 base64 < "$OUT/$slug.mcpb" | tr -d '\n' > "$OUT/$slug.mcpb.b64"
 rm -rf "$work"
-echo "built: $OUT/$slug.mcpb  (name=apexti-$slug prefix=$prefix ws=${WORKSPACE_ID:0:8})"
+echo "built: $OUT/$slug.mcpb  (name=apexti-$slug prefix=$prefix; workspace ID entered at install)"
 echo "b64:   $OUT/$slug.mcpb.b64  ($(wc -c < "$OUT/$slug.mcpb.b64") bytes)"
