@@ -30,6 +30,11 @@ let API_KEY = clean(process.env.TOOLBELT_API_KEY) || readKeyFile();
 const WORKSPACE_ID = clean(process.env.TOOLBELT_WORKSPACE_ID);
 const BASE_URL = (clean(process.env.TOOLBELT_BASE_URL) || "https://toolbelt.apexti.com").replace(/\/+$/, "");
 let NAME = clean(process.env.TOOLBELT_ASSISTANT_NAME);
+// Optional self-description + trigger phrases — baked into branded .mcpb builds so the
+// connector can route itself via the entry tool's description (the one channel Desktop
+// reliably reads), letting a standalone .mcpb work without the companion skill.
+const SELF_DESC = clean(process.env.TOOLBELT_ASSISTANT_DESC);
+const SELF_TRIGGERS = clean(process.env.TOOLBELT_ASSISTANT_TRIGGERS);
 const MCP_URL = `${BASE_URL}/api/workspaces/${WORKSPACE_ID}/mcp`;
 // Missing workspace ID is NOT fatal — exiting makes Claude show an opaque "server crashed".
 // Stay alive and surface a clear config tool instead (handled in needsSetup/tools list).
@@ -295,14 +300,20 @@ let toolsCache = { tools: null, at: 0 };
 const TOOLS_TTL_MS = 30 * 1000;
 const needsSetup = () => !API_KEY || !WORKSPACE_ID;
 
-const personaTool = () => ({
-  name: PERSONA_TOOL,
-  description:
-    `Load the live operating instructions (persona) of the "${NAME || "Toolbelt"}" assistant from Toolbelt. ` +
-    `Call this when asked to act as the assistant, then fully adopt the returned instructions for the conversation.`,
-  inputSchema: { type: "object", properties: {} },
-  annotations: { readOnlyHint: true },
-});
+const personaTool = () => {
+  const who = NAME || "this Toolbelt assistant";
+  return {
+    name: PERSONA_TOOL,
+    description:
+      `★ ${who} — START HERE. ${SELF_DESC ? SELF_DESC + " " : ""}` +
+      `Call this tool FIRST whenever the user refers to "${who}" / "my ${who}", ` +
+      `${SELF_TRIGGERS ? `or asks about ${SELF_TRIGGERS}, ` : ""}` +
+      `or wants to use this assistant. It loads ${who}'s live operating instructions; ` +
+      `then act as ${who} using the other ${PREFIX || ""}* tools (all tagged "[${NAME || "this assistant"}]").`,
+    inputSchema: { type: "object", properties: {} },
+    annotations: { readOnlyHint: true },
+  };
+};
 const setupTool = () => ({
   name: SETUP_TOOL,
   description:

@@ -30,6 +30,8 @@ const m=JSON.parse(fs.readFileSync(tpl,"utf8"));
 const name=process.env.AGENT_NAME, prefix=process.env.PREFIX, desc=process.env.DESC, slug=process.env.SLUG, base=process.env.BASE_URL;
 m.name="apexti-"+slug; m.display_name=name; m.description=desc;
 m.server.mcp_config.env.TOOLBELT_ASSISTANT_NAME=name;
+if(process.env.AGENT_DESC) m.server.mcp_config.env.TOOLBELT_ASSISTANT_DESC=process.env.AGENT_DESC;
+if(process.env.AGENT_TRIGGERS) m.server.mcp_config.env.TOOLBELT_ASSISTANT_TRIGGERS=process.env.AGENT_TRIGGERS;
 m.server.mcp_config.env.TOOLBELT_TOOL_PREFIX=prefix;
 m.server.mcp_config.env.TOOLBELT_BASE_URL=base;
 delete m.user_config.assistant_name; // name is baked
