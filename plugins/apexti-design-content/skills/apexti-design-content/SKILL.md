@@ -1,11 +1,11 @@
 ---
 name: apexti-design-content
-description: Use the Apexti-Design-Content assistant whenever the user asks about design, graphics, branding, marketing copy, content creation, social posts, landing pages, or visual assets. Routes such requests to the "Apexti-Design-Content" connector (Powered by Apexti).
+description: Use the Apexti-Design-Content assistant whenever the user asks about design, branded assets, slides/decks, HTML pages, dashboards, PDFs, documents, marketing copy, brand style, or style-guide questions. Routes such requests to the "Apexti-Design-Content" connector (Powered by Apexti).
 ---
 
 # Apexti-Design-Content
 
-Design and content assistant for Apexti — brand-consistent graphics, copy, and content production.
+Apexti's design & content source-of-truth: creates brand-consistent Google Slides, HTML pages, dashboards, PDFs, and documents, enforcing the Apexti style guide. Other assistants call it for style-consistent design work.
 
 This skill is a thin router. Apexti-Design-Content's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
@@ -86,7 +86,7 @@ The agent's storage is the durable "brain" — treat it with care (full contract
 Snapshot this skill was generated from (compare against the live `load_persona` result):
 
 - workspace: 279f3b80-9f2c-441d-a0af-084e84481e36
-- description at generation: "Design and content assistant for Apexti — brand-consistent graphics, copy, and content production."
+- description at generation: "Apexti's design & content source-of-truth: creates brand-consistent Google Slides, HTML pages, dashboards, PDFs, and documents, enforcing the Apexti style guide. Other assistants call it for style-consistent design work."
 - generated: 2026-06-11
 
 If the live assistant's purpose or skills have drifted from this file, tell the user and

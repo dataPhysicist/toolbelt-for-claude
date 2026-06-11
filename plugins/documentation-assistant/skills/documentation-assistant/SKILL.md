@@ -1,11 +1,11 @@
 ---
 name: documentation-assistant
-description: Use the Documentation-Assistant assistant whenever the user asks about documentation, docs, runbooks, how-to guides, README files, knowledge base articles, or process write-ups. Routes such requests to the "Documentation-Assistant" connector (Powered by Apexti).
+description: Use the Documentation-Assistant assistant whenever the user asks about documentation, product docs, how-to guides, references, runbooks, README files, knowledge base articles, or turning a chat explanation into docs. Routes such requests to the "Documentation-Assistant" connector (Powered by Apexti).
 ---
 
 # Documentation-Assistant
 
-Documentation assistant: drafts, structures, and maintains product and process documentation.
+Turns chat explanations into real product documentation — an expert technical documentarian (Splunk Style Guide: clarity, active voice, why-before-how) for guides, references, and runbooks.
 
 This skill is a thin router. Documentation-Assistant's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
@@ -86,7 +86,7 @@ The agent's storage is the durable "brain" — treat it with care (full contract
 Snapshot this skill was generated from (compare against the live `load_persona` result):
 
 - workspace: 390b55c4-4335-4b9b-9f79-97aeafde3052
-- description at generation: "Documentation assistant: drafts, structures, and maintains product and process documentation."
+- description at generation: "Turns chat explanations into real product documentation — an expert technical documentarian (Splunk Style Guide: clarity, active voice, why-before-how) for guides, references, and runbooks."
 - generated: 2026-06-11
 
 If the live assistant's purpose or skills have drifted from this file, tell the user and

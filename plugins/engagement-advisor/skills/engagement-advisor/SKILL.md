@@ -1,11 +1,11 @@
 ---
 name: engagement-advisor
-description: Use the Engagement-Advisor assistant whenever the user asks about HubSpot deals, the Engagements pipeline, deal status, weekly deal digest, Grain recordings into HubSpot, next steps, or CRM updates. Routes such requests to the "Engagement-Advisor" connector (Powered by Apexti).
+description: Use the Engagement-Advisor assistant whenever the user asks about HubSpot deals, the Engagements pipeline, deal status or activity, the weekly deal digest, next-step hygiene, or syncing deal updates. Routes such requests to the "Engagement-Advisor" connector (Powered by Apexti).
 ---
 
 # Engagement-Advisor
 
-HubSpot deal coach for the Engagements pipeline: weekly digests, Grain/Slack context into HubSpot, next-step hygiene, and deal creation/updates.
+HubSpot Engagements-pipeline deal coach: pulls open deals, reviews activity signals, posts an activity-only weekly digest to Slack, and keeps each deal's Next Step field synced.
 
 This skill is a thin router. Engagement-Advisor's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
@@ -86,7 +86,7 @@ The agent's storage is the durable "brain" — treat it with care (full contract
 Snapshot this skill was generated from (compare against the live `load_persona` result):
 
 - workspace: 08583ebe-041d-4ebe-bc90-706bd7b6c506
-- description at generation: "HubSpot deal coach for the Engagements pipeline: weekly digests, Grain/Slack context into HubSpot, next-step hygiene, and deal creation/updates."
+- description at generation: "HubSpot Engagements-pipeline deal coach: pulls open deals, reviews activity signals, posts an activity-only weekly digest to Slack, and keeps each deal's Next Step field synced."
 - generated: 2026-06-11
 
 If the live assistant's purpose or skills have drifted from this file, tell the user and

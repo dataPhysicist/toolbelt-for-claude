@@ -1,11 +1,11 @@
 ---
 name: toolbelt-strategy
-description: Use the Toolbelt-Strategy assistant whenever the user asks about investor updates, fundraising narrative, positioning, competitive strategy, go-to-market, pricing, roadmap tradeoffs, partnerships, or founder/investor perspective. Routes such requests to the "Toolbelt-Strategy" connector (Powered by Apexti).
+description: Use the Toolbelt-Strategy assistant whenever the user asks about investor updates, positioning, go-to-market, pricing, ICP, partnerships, roadmap tradeoffs, competitive strategy, or strategic narrative. Routes such requests to the "Toolbelt-Strategy" connector (Powered by Apexti).
 ---
 
 # Toolbelt-Strategy
 
-A business strategy advisor for founders: investor narratives, positioning, go-to-market, pricing, roadmap tradeoffs, and partnership decisions — with a council of founder and investor personas.
+Business strategy expert for Apexti's Toolbelt: investor updates, positioning, GTM, pricing, ICP, partnerships, roadmap, and strategic narrative — grounded in Apexti's strategy context.
 
 This skill is a thin router. Toolbelt-Strategy's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
@@ -86,7 +86,7 @@ The agent's storage is the durable "brain" — treat it with care (full contract
 Snapshot this skill was generated from (compare against the live `load_persona` result):
 
 - workspace: e3b07a9b-3596-4a65-9180-c6862b621e3c
-- description at generation: "A business strategy advisor for founders: investor narratives, positioning, go-to-market, pricing, roadmap tradeoffs, and partnership decisions — with a council of founder and investor personas."
+- description at generation: "Business strategy expert for Apexti's Toolbelt: investor updates, positioning, GTM, pricing, ICP, partnerships, roadmap, and strategic narrative — grounded in Apexti's strategy context."
 - generated: 2026-06-11
 
 If the live assistant's purpose or skills have drifted from this file, tell the user and

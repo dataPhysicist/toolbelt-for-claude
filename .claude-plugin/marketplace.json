@@ -28,27 +28,27 @@
     {
       "name": "toolbelt-strategy",
       "source": "./plugins/toolbelt-strategy",
-      "description": "A business strategy advisor for founders: investor narratives, positioning, go-to-market, pricing, roadmap tradeoffs, and partnership decisions — with a council of founder and investor personas. Routing skill — pair with the Toolbelt-Strategy connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
+      "description": "Business strategy expert for Apexti's Toolbelt: investor updates, positioning, GTM, pricing, ICP, partnerships, roadmap, and strategic narrative — grounded in Apexti's strategy context. Routing skill — pair with the Toolbelt-Strategy connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
     },
     {
       "name": "scarlett",
       "source": "./plugins/scarlett",
-      "description": "Scarlett — an Apexti assistant. (EDIT ME: one sentence on what Scarlett does.) Routing skill — pair with the Scarlett connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
+      "description": "Authorized penetration-testing and red-team security assistant: web/API/cloud/AI-agent security assessments, vulnerability validation, and remediation-focused reporting — strictly within approved scope and responsible disclosure. Routing skill — pair with the Scarlett connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
     },
     {
       "name": "apexti-design-content",
       "source": "./plugins/apexti-design-content",
-      "description": "Design and content assistant for Apexti — brand-consistent graphics, copy, and content production. Routing skill — pair with the Apexti-Design-Content connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
+      "description": "Apexti's design & content source-of-truth: creates brand-consistent Google Slides, HTML pages, dashboards, PDFs, and documents, enforcing the Apexti style guide. Other assistants call it for style-consistent design work. Routing skill — pair with the Apexti-Design-Content connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
     },
     {
       "name": "engagement-advisor",
       "source": "./plugins/engagement-advisor",
-      "description": "HubSpot deal coach for the Engagements pipeline: weekly digests, Grain/Slack context into HubSpot, next-step hygiene, and deal creation/updates. Routing skill — pair with the Engagement-Advisor connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
+      "description": "HubSpot Engagements-pipeline deal coach: pulls open deals, reviews activity signals, posts an activity-only weekly digest to Slack, and keeps each deal's Next Step field synced. Routing skill — pair with the Engagement-Advisor connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
     },
     {
       "name": "documentation-assistant",
       "source": "./plugins/documentation-assistant",
-      "description": "Documentation assistant: drafts, structures, and maintains product and process documentation. Routing skill — pair with the Documentation-Assistant connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
+      "description": "Turns chat explanations into real product documentation — an expert technical documentarian (Splunk Style Guide: clarity, active voice, why-before-how) for guides, references, and runbooks. Routing skill — pair with the Documentation-Assistant connector (.mcpb or gateway URL). Powered by Apexti (apexti.com)."
     }
   ]
 }

@@ -1,11 +1,11 @@
 ---
 name: scarlett
-description: Use the Scarlett assistant whenever the user asks about anything the user addresses to Scarlett by name, or asks Scarlett to handle. Routes such requests to the "Scarlett" connector (Powered by Apexti).
+description: Use the Scarlett assistant whenever the user asks about penetration testing, red teaming, security assessments, vulnerability validation, web/API/cloud/AI-agent security testing, exploit verification, or remediation reporting (authorized engagements only). Routes such requests to the "Scarlett" connector (Powered by Apexti).
 ---
 
 # Scarlett
 
-Scarlett — an Apexti assistant. (EDIT ME: one sentence on what Scarlett does.)
+Authorized penetration-testing and red-team security assistant: web/API/cloud/AI-agent security assessments, vulnerability validation, and remediation-focused reporting — strictly within approved scope and responsible disclosure.
 
 This skill is a thin router. Scarlett's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
@@ -86,7 +86,7 @@ The agent's storage is the durable "brain" — treat it with care (full contract
 Snapshot this skill was generated from (compare against the live `load_persona` result):
 
 - workspace: adc2a2b8-158b-4be1-8b16-cb645f572287
-- description at generation: "Scarlett — an Apexti assistant. (EDIT ME: one sentence on what Scarlett does.)"
+- description at generation: "Authorized penetration-testing and red-team security assistant: web/API/cloud/AI-agent security assessments, vulnerability validation, and remediation-focused reporting — strictly within approved scope and responsible disclosure."
 - generated: 2026-06-11
 
 If the live assistant's purpose or skills have drifted from this file, tell the user and
