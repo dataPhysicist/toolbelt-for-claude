@@ -88,6 +88,19 @@ How to delegate (the reliable pattern):
    (gemini-3.5-flash, gpt-5.4-mini) for routine work; claude-opus-4-8 for
    must-be-correct work; when unsure, round UP.
 
+## Org policy & approvals (set by IT/Security in Toolbelt)
+
+Tool permissions are governed server-side in Toolbelt (owner/org/workspace levels). A tool
+set to **"ask"** is NOT executed on the first call — Toolbelt returns an
+**APPROVAL REQUIRED** result with a Confirmation ID. When you see that:
+
+1. STOP. The action has not happened. Tell the user plainly what the action would do.
+2. Ask the user to approve. **Never approve on their behalf.**
+3. ONLY if the user explicitly approves, call the same tool again with the same arguments
+   plus `__confirmationId` set to the Confirmation ID. If they decline, do not proceed.
+
+A tool set to **"deny"** cannot be run — explain that org policy blocks it.
+
 ## Working with the agent's storage (interop contract)
 
 The agent's storage is the durable "brain" — treat it with care (full contract:

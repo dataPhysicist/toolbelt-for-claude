@@ -424,7 +424,8 @@ const handlers = {
         `This connector brings the Toolbelt assistant "${NAME || "(name loads on first use)"}" into Claude — ` +
         `its live tools, skills, and files. To adopt its persona, call the "${PERSONA_TOOL}" tool and fully adopt what it returns. ` +
         `If this connector exposes ONLY a "${SETUP_TOOL}" or "${STATUS_TOOL}" tool (instead of the agent's many tools), its ` +
-        `configuration is wrong — tell the user to correct the API key and/or Workspace ID in Settings → Extensions → ${NAME || "this connector"}, then start a new chat.`,
+        `configuration is wrong — tell the user to correct the API key and/or Workspace ID in Settings → Extensions → ${NAME || "this connector"}, then start a new chat. ` +
+        `If a tool result says APPROVAL REQUIRED with a Confirmation ID, that is an org-policy gate set in Toolbelt — ask the user to approve, never self-approve, and only then re-call the tool with __confirmationId.`,
     };
   },
   ping: async () => ({}),
@@ -490,6 +491,27 @@ const handlers = {
       const fwd = { name: upstreamName, arguments: args };
       if (params?._meta) fwd._meta = params._meta;
       const res = await rpcUpstream("tools/call", fwd);
+      // ORG-POLICY APPROVAL GATE: a tool set to "ask" by IT/Security (owner/org/workspace
+      // policy in Toolbelt) is NOT executed — Toolbelt returns needsConfirmation + a
+      // confirmationId, and runs only when re-called with __confirmationId. Surface this as
+      // a clear, human-in-the-loop request: put the confirmationId IN the text (Toolbelt
+      // only puts it in a side field), and instruct Claude to get the USER's approval and
+      // never self-approve.
+      if (res && res.needsConfirmation && res.confirmationId) {
+        const gatedName = name; // the prefixed name the client re-calls
+        res.content = [{
+          type: "text",
+          text:
+            `🔒 APPROVAL REQUIRED — your organization's policy (set in Toolbelt by IT/Security) ` +
+            `requires explicit approval before "${res.toolName || upstreamName}" runs. The action has NOT happened.\n\n` +
+            `Confirmation ID: ${res.confirmationId}\n\n` +
+            `Tell the user plainly what this action will do and ask them to approve. ` +
+            `Do NOT approve on their behalf. ONLY if the user explicitly approves, call ` +
+            `\`${gatedName}\` again with the same arguments PLUS \`__confirmationId\`: "${res.confirmationId}". ` +
+            `If they decline, do not proceed.`,
+        }];
+        return res; // preserve needsConfirmation/confirmationId fields too
+      }
       // Some Toolbelt tools answer with structuredContent and an empty content array —
       // which clients render as "no output", hiding even their error messages.
       if (res && (!Array.isArray(res.content) || res.content.length === 0)) {
