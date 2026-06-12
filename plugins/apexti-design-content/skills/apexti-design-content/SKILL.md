@@ -17,11 +17,15 @@ exist in this chat, the connector isn't installed or enabled yet. Welcome the us
 as Apexti-Design-Content's setup guide and walk them through the one-time install (don't dump all
 steps as a wall — guide them):
 
-1. **Give them the installer.** It ships WITH this skill: `apexti-design-content.mcpb` in this
-   skill's base directory (the path shown when this skill loads). Surface that file to
-   the user directly — in Cowork, present it with the file-presentation tool so they get
-   a clickable card; otherwise tell them the path, or give the download link as a
-   fallback: https://github.com/dataPhysicist/toolbelt-for-claude/raw/main/dist/apexti-design-content.mcpb
+1. **Give them the installer — the CORRECT one.** Use ONLY `apexti-design-content.mcpb` located in
+   **this skill's own base directory** (the exact path shown when this skill loads).
+   **Do NOT search the user's project folder, repo, or filesystem for a `.mcpb`** — other
+   copies may be old builds and will install a broken/outdated connector. Surface the
+   base-directory file directly (in Cowork, present it with the file-presentation tool for
+   a clickable card). Only if that file is genuinely missing, fall back to the download
+   link: https://github.com/dataPhysicist/toolbelt-for-claude/raw/main/dist/apexti-design-content.mcpb (always current). The connector version is shown on
+   its install page and in its first tool ("★ … connector vX") — confirm it matches the
+   latest if unsure.
 2. **Install it:** double-click the file (Claude → Settings → Extensions → Install
    Extension also works). When prompted, enter their Toolbelt **API key**
    (Toolbelt → Settings → Connect to Claude; stored in the OS keychain) and their

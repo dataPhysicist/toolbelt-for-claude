@@ -1,8 +1,0 @@
-# Trim the packed .mcpb to runtime-only files.
-# (mcpb pack already excludes .git, *.log, *.map, package-lock.json by default.)
-# Do NOT add router-instructions.md or bridge.js — they are read at runtime.
-
-pack-agent.mjs
-README.md
-*.mcpb
-.gitignore
