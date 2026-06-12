@@ -62,6 +62,17 @@ and governance — live in a layer that speaks to *every* provider and *every* i
 Claude is a front door you chose, not a foundation you're stuck on. Swap models, mix
 providers, or add ChatGPT and Gemini as additional front doors — nothing gets rebuilt.
 
+**Approvals your IT team controls — enforced inside Claude.** This is the one most
+AI-in-chat setups can't do. In Toolbelt, IT/Security sets per-tool permissions
+(`allow` / `ask` / `deny`) at the owner, org, or workspace level. When a user in Claude
+triggers an action marked **"ask"** — say, sending an external email or a CRM write —
+Toolbelt **refuses to run it** and the connector shows a clear **🔒 APPROVAL REQUIRED**
+prompt; the action only happens after the user explicitly approves, and a **"deny"** tool
+can't run at all. The policy lives on the server, so a user can't switch it off from their
+Claude settings, and it works on today's Claude clients with no special support. Compare
+that to raw Claude, where tool permissions are per-user client config that no admin can
+govern. **Same chat your team already likes — now with the guardrails an enterprise needs.**
+
 **Agents coexist cleanly.** Every agent's tools are namespaced (`cos_*`, `st_*`), so you
 can run your whole roster in one chat without collisions, toggle each agent per
 conversation, and see exactly which agent did what in the tool-call log.

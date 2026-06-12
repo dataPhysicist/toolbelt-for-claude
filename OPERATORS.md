@@ -75,6 +75,24 @@ once on any HTTPS host, and connectors become a URL with a browser sign-in — a
 path to claude.ai web support. Recommended once you're distributing beyond a handful of
 users.
 
+## Governed approvals (a selling point for IT/Security)
+
+Tool permissions are set **server-side in Toolbelt** by whoever owns the service/org/
+workspace — not in each user's Claude settings. Set a tool to:
+
+- **`allow`** — runs normally.
+- **`ask`** — Toolbelt refuses to run it and the connector shows the user a
+  **🔒 APPROVAL REQUIRED** prompt in Claude; it executes only after the user explicitly
+  approves (the proxy re-calls with the confirmation Toolbelt issued). Use for external
+  sends, CRM/finance writes, deletes — anything irreversible.
+- **`deny`** — cannot be run from any client; Claude explains org policy blocks it.
+
+Because the policy and enforcement live on the server, a user can't switch it off from
+their Claude connector settings — which is exactly what a customer's security review wants
+to hear. Pair this with Toolbelt's audit log and you can show *what ran, who approved it,
+and that it stayed in policy*. (Lead with this when selling to regulated or IT-cautious
+customers; it's the clearest "why not just raw Claude?" answer.)
+
 ## Updating agents after launch
 
 - **Instructions, skills (wrenches), files, memory, model:** edit in Toolbelt — live
