@@ -144,6 +144,9 @@ More agents are added by registering them in the build roster (`assistants.json`
 rebuilding — each becomes its own connector + skill pair, installable and toggleable
 independently.
 
+See [`ROADMAP.md`](ROADMAP.md) for what's shipped and what's next (true keyless connect,
+custom domain, CI drift-guards).
+
 ---
 
 Powered by [Apexti](https://apexti.com) · Toolbelt is the operating layer for governed AI

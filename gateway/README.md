@@ -50,6 +50,17 @@ employees add the connector and sign in with their own Toolbelt keys — so per-
 and IT/Security's server-side tool policy both apply. Pair with the marketplace routing
 skills for the best in-chat experience.
 
+## Branding / connector icon
+
+`gateway/icon.png` (512×512) is served at `/icon.png` and `/favicon.*`, shown on the
+sign-in page, and advertised in the MCP `initialize` response as `serverInfo.icons`
+(MCP spec SEP-973). Replace that file to rebrand. **Caveat:** today Claude.ai shows a
+generic icon for *all* custom/URL connectors — it doesn't yet read `serverInfo.icons`
+([claude-ai-mcp#152](https://github.com/anthropics/claude-ai-mcp/issues/152)). This setup
+is forward-compatible: the Apexti icon appears automatically once that ships, and the
+sign-in page already shows it. (The `.mcpb` install path shows the icon today, via its
+manifest.)
+
 ## Security notes
 
 - Access tokens (30d) + refresh tokens (90d) carry the sealed key; the gateway holds no state.

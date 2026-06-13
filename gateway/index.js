@@ -20,6 +20,10 @@
  */
 import { createServer } from "node:http";
 import { createHash, createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
+import { StringDecoder } from "node:string_decoder";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 // Auto-generate a secret if none is set (logged once so you can pin it). Pin it in env
 // for production — rotating it logs everyone out.
@@ -32,6 +36,15 @@ const PUBLIC_URL = (process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL ||
 const TOOLBELT = (process.env.TOOLBELT_BASE_URL || "https://toolbelt.apexti.com").replace(/\/+$/, "");
 const AES_KEY = createHash("sha256").update(SECRET).digest();
 const log = (...a) => console.error(`[gateway] ${a.join(" ")}`);
+
+// Brand icon: served at /icon.png + /favicon.* and advertised in the MCP initialize
+// response (serverInfo.icons, MCP spec SEP-973) so clients that support it show Apexti's
+// logo instead of a generic globe. Loaded once; gateway runs fine without it.
+let ICON_BUF = null, ICON_DATA_URI = null;
+try {
+  ICON_BUF = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "icon.png"));
+  ICON_DATA_URI = `data:image/png;base64,${ICON_BUF.toString("base64")}`;
+} catch { log("no icon.png next to index.js — connector will use the client's default icon"); }
 
 // ---------- sealed tokens (AES-256-GCM, stateless) ----------
 const b64u = (b) => Buffer.from(b).toString("base64url");
@@ -65,6 +78,63 @@ const html = (res, code, body) => { res.writeHead(code, { "content-type": "text/
 const readBody = (req) => new Promise((ok, no) => { let d = ""; req.on("data", (c) => (d += c)); req.on("end", () => ok(d)); req.on("error", no); });
 const form = (s) => Object.fromEntries(new URLSearchParams(s));
 
+// CORS: remote MCP calls are usually server-side, but claude.ai web may preflight.
+const CORS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, DELETE, OPTIONS",
+  "access-control-allow-headers": "authorization, content-type, mcp-session-id, mcp-protocol-version, last-event-id",
+  "access-control-expose-headers": "mcp-session-id, mcp-protocol-version, www-authenticate",
+  "access-control-max-age": "86400",
+};
+
+// ---------- response transforms (parity with the local .mcpb proxy) ----------
+// Mutate a parsed JSON-RPC message in place IFF it needs help: inject the brand icon into
+// the initialize handshake, surface org-policy gates, and convert structured-only results
+// to text. Tightly scoped so unrelated responses pass through untouched. Returns true if changed.
+function rewriteMessage(msg) {
+  const r = msg && typeof msg === "object" && !Array.isArray(msg) ? msg.result : null;
+  if (!r || typeof r !== "object") return false;
+  // initialize: advertise the brand icon (additive; clients without support ignore it).
+  if (r.serverInfo && typeof r.serverInfo === "object" && ICON_DATA_URI && !r.serverInfo.icons) {
+    r.serverInfo.icons = [{ src: ICON_DATA_URI, mimeType: "image/png", sizes: ["512x512"] }];
+    return true;
+  }
+  // Org-policy "ask" gate: surface needsConfirmation as a clear human-approval request.
+  if (r.needsConfirmation && r.confirmationId) {
+    const name = r.toolName || "this action";
+    r.content = [{ type: "text", text:
+      `🔒 APPROVAL REQUIRED — your organization's policy (set in Toolbelt by IT/Security) ` +
+      `requires explicit approval before "${name}" runs. The action has NOT happened.\n\n` +
+      `Confirmation ID: ${r.confirmationId}\n\n` +
+      `Tell the user plainly what this action will do and ask them to approve. ` +
+      `Do NOT approve on their behalf. ONLY if the user explicitly approves, call ` +
+      `\`${name}\` again with the same arguments PLUS \`__confirmationId\`: "${r.confirmationId}". ` +
+      `If they decline, do not proceed.` }];
+    return true;
+  }
+  // Empty content + structuredContent → readable text (clients render empty content as
+  // "no output"). Only fires when structuredContent exists, so non-tool results are safe.
+  if ((!Array.isArray(r.content) || r.content.length === 0) && r.structuredContent !== undefined) {
+    r.content = [{ type: "text", text: JSON.stringify(r.structuredContent, null, 2) }];
+    return true;
+  }
+  return false;
+}
+const applyRewrite = (msg) => Array.isArray(msg) ? msg.map(rewriteMessage).some(Boolean) : rewriteMessage(msg);
+
+// Transform one complete SSE event's text; leave framing (event:/id:/comments) intact.
+function transformSseEvent(raw) {
+  if (!raw.trim()) return raw;
+  const lines = raw.split("\n");
+  const dataLines = lines.filter((l) => l.startsWith("data:")).map((l) => l.slice(5).replace(/^ /, ""));
+  if (!dataLines.length) return raw;
+  let msg;
+  try { msg = JSON.parse(dataLines.join("\n")); } catch { return raw; }
+  if (!applyRewrite(msg)) return raw;
+  const head = lines.filter((l) => !l.startsWith("data:") && l !== "");
+  return [...head, `data: ${JSON.stringify(msg)}`].join("\n");
+}
+
 const AS_META = {
   issuer: PUBLIC_URL,
   authorization_endpoint: `${PUBLIC_URL}/oauth/authorize`,
@@ -80,13 +150,15 @@ const AS_META = {
 const PAGE = (params, err = "") => `<!doctype html><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Connect to Toolbelt</title>
+<link rel="icon" type="image/png" href="/icon.png">
 <body style="font-family:system-ui;max-width:430px;margin:8vh auto;padding:0 20px;color:#111">
+${ICON_BUF ? `<img src="/icon.png" alt="Apexti" width="56" height="56" style="border-radius:12px;display:block;margin-bottom:12px">` : ""}
 <h2 style="margin-bottom:4px">Connect Claude to Toolbelt</h2>
 <p style="color:#555">Enter your Toolbelt API key (Toolbelt → Settings → Connect to Claude).
 It is encrypted into your session and never shown to Claude.</p>
 ${err ? `<p style="color:#c0392b">${err}</p>` : ""}
 <form method="POST" action="/oauth/authorize">
-${Object.entries(params).map(([k, v]) => `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, "&quot;")}">`).join("\n")}
+${Object.entries(params).filter(([k]) => k !== "api_key").map(([k, v]) => `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, "&quot;")}">`).join("\n")}
 <input name="api_key" type="password" required placeholder="tb_..." autofocus
  style="width:100%;padding:12px;font-size:15px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box">
 <button style="margin-top:12px;width:100%;padding:12px;font-size:15px;border:0;border-radius:8px;background:#111;color:#fff;cursor:pointer">
@@ -98,6 +170,9 @@ const server = createServer(async (req, res) => {
   const url = new URL(req.url, PUBLIC_URL);
   const path = url.pathname;
   try {
+    // --- CORS preflight (claude.ai web) ---
+    if (req.method === "OPTIONS") { res.writeHead(204, CORS); return res.end(); }
+
     // --- OAuth discovery ---
     if (req.method === "GET" && path.startsWith("/.well-known/oauth-protected-resource")) {
       const resource = path.replace("/.well-known/oauth-protected-resource", "") || "/";
@@ -135,11 +210,14 @@ const server = createServer(async (req, res) => {
       // validate against a specific/dummy workspace — a valid key returns 403 for a
       // workspace it can't access, which would wrongly reject good keys. GET /api/workspaces
       // accepts apiKeyAuth and needs no workspace, so only 401 means a bad key.
+      const ac = new AbortController();
+      const vt = setTimeout(() => ac.abort(), 5000);
       try {
-        const r = await fetch(`${TOOLBELT}/api/workspaces`, { headers: { authorization: `Bearer ${key}`, accept: "application/json" } });
+        const r = await fetch(`${TOOLBELT}/api/workspaces`, { headers: { authorization: `Bearer ${key}`, accept: "application/json" }, signal: ac.signal });
         if (r.status === 401) return html(res, 200, PAGE(f, "Toolbelt rejected that key (401). Get a fresh key from Toolbelt → Settings → Connect to Claude and try again."));
         r.body?.cancel?.().catch?.(() => {});
-      } catch { /* Toolbelt unreachable — accept; the first real MCP call will surface any issue */ }
+      } catch { /* Toolbelt unreachable or slow (>5s) — accept; the first real MCP call will surface any issue */ }
+      finally { clearTimeout(vt); }
       const code = seal({ t: "code", k: key, cid: f.client_id.slice(-24), ru: f.redirect_uri, cc: f.code_challenge, exp: Date.now() + 5 * 60 * 1000 });
       const loc = new URL(f.redirect_uri);
       loc.searchParams.set("code", code);
@@ -180,6 +258,7 @@ const server = createServer(async (req, res) => {
       const tok = unseal((req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
       if (!tok || tok.t !== "access") {
         return json(res, 401, { error: "invalid_token" }, {
+          ...CORS,
           "www-authenticate": `Bearer resource_metadata="${PUBLIC_URL}/.well-known/oauth-protected-resource/workspaces/${m[1]}/mcp"`,
         });
       }
@@ -188,15 +267,53 @@ const server = createServer(async (req, res) => {
         if (req.headers[h]) fwdHeaders[h] = req.headers[h];
       const body = req.method === "POST" ? await readBody(req) : undefined;
       const up = await fetch(`${TOOLBELT}/api/workspaces/${m[1]}/mcp`, { method: req.method, headers: fwdHeaders, body });
-      const outHeaders = {};
+      const ctype = (up.headers.get("content-type") || "").split(";")[0].trim();
+      const outHeaders = { ...CORS };
       for (const h of ["content-type", "mcp-session-id", "mcp-protocol-version"]) {
         const v = up.headers.get(h);
         if (v) outHeaders[h] = v;
       }
+      if (!up.body) { res.writeHead(up.status, outHeaders); return res.end(); }
+
+      // application/json: buffer, rewrite tool results, re-serialize.
+      if (ctype === "application/json") {
+        const buf = Buffer.from(await up.arrayBuffer());
+        let out = buf;
+        try { const msg = JSON.parse(buf.toString("utf8")); if (applyRewrite(msg)) out = Buffer.from(JSON.stringify(msg)); }
+        catch { /* not JSON-RPC we recognize — pass through untouched */ }
+        res.writeHead(up.status, outHeaders);
+        return res.end(out);
+      }
+
+      // text/event-stream: transform per complete event, preserving streaming + framing.
+      if (ctype === "text/event-stream") {
+        res.writeHead(up.status, outHeaders);
+        const dec = new StringDecoder("utf8");
+        let bufS = "";
+        for await (const chunk of up.body) {
+          bufS += dec.write(Buffer.from(chunk));
+          let i;
+          while ((i = bufS.indexOf("\n\n")) !== -1) {
+            res.write(transformSseEvent(bufS.slice(0, i)) + "\n\n");
+            bufS = bufS.slice(i + 2);
+          }
+        }
+        bufS += dec.end();
+        if (bufS) res.write(transformSseEvent(bufS));
+        return res.end();
+      }
+
+      // Anything else: stream through unchanged.
       res.writeHead(up.status, outHeaders);
-      if (!up.body) return res.end();
-      for await (const chunk of up.body) res.write(chunk); // streams SSE through
+      for await (const chunk of up.body) res.write(chunk);
       return res.end();
+    }
+
+    // Brand icon (served for favicon-based clients + the sign-in page <img>).
+    if (req.method === "GET" && (path === "/icon.png" || path === "/favicon.png" || path === "/favicon.ico")) {
+      if (!ICON_BUF) return json(res, 404, { error: "no_icon" });
+      res.writeHead(200, { "content-type": "image/png", "cache-control": "public, max-age=86400", "access-control-allow-origin": "*" });
+      return res.end(ICON_BUF);
     }
 
     if (path === "/" || path === "/health") return json(res, 200, { ok: true, service: "toolbelt-oauth-gateway", issuer: PUBLIC_URL });
