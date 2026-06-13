@@ -55,6 +55,21 @@ enforced inside Claude.
 - **Rate-limit the `/oauth/*` endpoints** and add structured request logging/metrics to the
   gateway (currently `/health` + stderr only).
 
+## P1.5 — auto-routing (stronger, server-side)
+
+The gateway now injects identity + a "use me, call load_persona first" nudge into the
+`initialize` instructions, and the routing skills are connector-agnostic (recognize both
+the gateway's unprefixed tools and the `.mcpb`'s prefixed ones). Two further options if
+hands-free routing still needs to be stronger *without* installing the skill:
+
+- **Per-agent triggers in the gateway.** Ship a small `workspace_id → {name, triggers}`
+  map alongside the gateway (generated from `assistants.json`) so the `initialize`
+  instructions name the agent's actual trigger phrases — server-side routing as strong as
+  the skill, no plugin needed. Cost: redeploy the gateway when the roster changes.
+- **Synthetic "★ START HERE" entry tool** in the gateway's `tools/list` (mirrors the
+  `.mcpb` proxy), with the gateway intercepting calls to it. Strong nudge, but adds a tool
+  and a small amount of call-handling state to the otherwise pass-through gateway.
+
 ## P2 — drift prevention & coverage
 
 - **CI checks** in this repo: (a) fail if `packager/server.js` ≠ `toolbelt-assistant-mcpb/

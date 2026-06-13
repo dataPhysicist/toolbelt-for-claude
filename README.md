@@ -21,12 +21,17 @@ claude.ai web**.
    gateway; Claude only ever holds opaque tokens.
 3. **Start a new chat**, toggle the agent on in the "+" → Connectors menu, and ask away.
 
-That's the whole install — the connector self-routes, so it works on its own. Edit the
-agent in Toolbelt and the next message reflects it; nothing is copied or goes stale.
+That's the whole install. Edit the agent in Toolbelt and the next message reflects it;
+nothing is copied or goes stale.
+
+**For hands-free routing, also install the agent's routing skill** (below). The connector
+identifies itself and nudges Claude to use it, but the skill is what carries the trigger
+phrases that make *"what's on my calendar?"* land on the right agent without you naming
+the connector. Connector = the tools; skill = knowing when to reach for them.
 
 > **No gateway URL yet?** Deploy [`gateway/`](gateway/README.md) once (~5 min on Render)
-> and every agent becomes one URL like the above. **Want the routing skill or an offline
-> install instead?** See [More ways to install](#more-ways-to-install).
+> and every agent becomes one URL like the above. **Routing skill or an offline install?**
+> See [More ways to install](#more-ways-to-install).
 
 ---
 
@@ -96,11 +101,13 @@ team already likes — now with the guardrails an enterprise needs.**
 
 The Quick Start above is all most people need. The other pieces are optional:
 
-**Routing skill (marketplace plugin).** Customize → Plugins → "+" → **Add marketplace** →
-enter `dataPhysicist/toolbelt-for-claude`, then install the agent (e.g. **Chief of
-staff**). It teaches Claude *when* to reach for the agent unprompted ("ask my
-Chief-of-Staff…"), hands you the connect URL on first run, and auto-updates from this
-repo. Optional — the connector self-routes without it.
+**Routing skill (marketplace plugin) — recommended for auto-routing.** Customize →
+Plugins → "+" → **Add marketplace** → enter `dataPhysicist/toolbelt-for-claude`, then
+install the agent (e.g. **Chief of staff**). It teaches Claude *when* to reach for the
+agent unprompted ("ask my Chief-of-Staff…"), hands you the connect URL on first run, and
+auto-updates from this repo. The connector works without it (and now self-identifies so
+Claude routes better on its own), but if Claude makes you name the connector each time,
+the skill is the fix — its trigger phrases are what drive hands-free routing.
 
 **Offline / keychain install (`.mcpb`).** Prefer your key in the OS keychain, or working
 without the gateway? Double-click the agent's `.mcpb` (in [`dist/`](dist/), or bundled in

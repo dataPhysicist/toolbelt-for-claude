@@ -10,6 +10,12 @@ Builds Claude .mcpb connectors and marketplace plugins for any Toolbelt assistan
 This skill is a thin router. Claude-Packager's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
 
+> **Tool-name convention used throughout this file:** tool names below are written with the
+> `cp_` prefix (the form the `.mcpb` install uses). When Claude-Packager is connected via the
+> **gateway URL** instead, the SAME tools appear **without** that prefix, grouped under the
+> "Claude-Packager" connector (e.g. `load_persona` rather than `cp_load_persona`). Treat every
+> `cp_`-prefixed name below as "with or without the prefix, whichever is present."
+
 ## Getting started (first run — no Claude-Packager tools available)
 
 This skill routes to the Claude-Packager **connector**. If no tools tagged "[Claude-Packager]"
@@ -62,26 +68,36 @@ installed but missing its key — ask for the API key and call `cp_toolbelt_setu
 "Use Claude-Packager" means: become Claude-Packager and use its tools directly. It does NOT
 mean hand the task to a sub-agent. Resolve access in this order:
 
-1. **Direct tools (the normal case in Claude Desktop/Cowork).** If tools named
-   `cp_*` (e.g. `cp_load_persona`, `cp_get_calendar`) are available,
-   USE THEM DIRECTLY. Call `cp_load_persona` first to adopt the operating
-   instructions, then do the work with the agent's own tools. This is the primary path —
-   never reach for `manage_delegations` when `cp_*` tools exist.
-2. **No `cp_*` tools yet?** They may be a moment from loading — try once more / a
-   new message. If a generic `manage_delegations` IS available (a Toolbelt-native
-   session) and the `cp_*` tools are not, then delegate to assistant id
-   `fac7249f-02a4-4ccb-be51-bb75c3765cf6` via `manage_delegations`.
+> **Tool names depend on how Claude-Packager is connected — match EITHER form:**
+> • **Gateway URL connector (recommended):** tools are **unprefixed** and grouped under the
+>   "Claude-Packager" connector — e.g. `load_persona`, `get_calendar`, `wrench_execute`.
+> • **`.mcpb` install:** the same tools are **prefixed** with the agent's initials —
+>   `cp_load_persona`, `cp_get_calendar`, `cp_wrench_execute`.
+> Below, `load_persona` means "the load_persona tool in whichever form is present." If a
+> request is in Claude-Packager's lane and a `load_persona`/`cp_load_persona` tool exists in
+> this chat, that IS Claude-Packager — route to it; don't ask the user which connector to use.
+
+1. **Direct tools (the normal case in Claude Desktop/Cowork).** If Claude-Packager's tools are
+   present in EITHER form above — a `load_persona` (or `cp_load_persona`) tool exists —
+   USE THEM DIRECTLY. Call `load_persona` first to adopt the operating instructions, then
+   do the work with the agent's own tools. This is the primary path — never reach for
+   `manage_delegations` when these tools exist.
+2. **No such tools yet?** They may be a moment from loading — try once more / a new
+   message. If a generic `manage_delegations` IS available (a Toolbelt-native session) and
+   Claude-Packager's tools are not, then delegate to assistant id `fac7249f-02a4-4ccb-be51-bb75c3765cf6` via
+   `manage_delegations`.
 3. **Neither available?** The Claude-Packager connector isn't loaded for this chat. Tell
    the user to enable "Claude-Packager" in the "+" → Connectors menu (or install it), and
    stop — don't silently substitute yourself.
 
 Once you have the agent (path 1 or 2):
 
-- BEFORE real work, `cp_load_persona` and fully adopt the returned instructions
-  (several agents share services like calendar/email — what differs is their context).
-- Prefer the agent's own tools: `cp_wrench_*` are its skills;
-  `cp_read_storage_file` / `cp_list_storage_files` / `cp_grep_storage_file`
-  are its files and memory.
+- BEFORE real work, call `load_persona` (`cp_load_persona`) and fully adopt the
+  returned instructions (several agents share services like calendar/email — what differs
+  is their context).
+- Prefer the agent's own tools: the `wrench_*` tools are its skills;
+  `read_storage_file` / `list_storage_files` / `grep_storage_file` (or the `cp_`
+  forms) are its files and memory.
 - Answer in the agent's voice and cite what you used.
 
 ## Delegating to OTHER MODELS (sub-chats / Model Auto-Pilot)

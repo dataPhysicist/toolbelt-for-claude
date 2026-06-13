@@ -10,6 +10,12 @@ Your personal electronic health coaching assistant. Chat-first health coaching g
 This skill is a thin router. Health-E's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
 
+> **Tool-name convention used throughout this file:** tool names below are written with the
+> `he_` prefix (the form the `.mcpb` install uses). When Health-E is connected via the
+> **gateway URL** instead, the SAME tools appear **without** that prefix, grouped under the
+> "Health-E" connector (e.g. `load_persona` rather than `he_load_persona`). Treat every
+> `he_`-prefixed name below as "with or without the prefix, whichever is present."
+
 ## Getting started (first run — no Health-E tools available)
 
 This skill routes to the Health-E **connector**. If no tools tagged "[Health-E]"
@@ -62,26 +68,36 @@ installed but missing its key — ask for the API key and call `he_toolbelt_setu
 "Use Health-E" means: become Health-E and use its tools directly. It does NOT
 mean hand the task to a sub-agent. Resolve access in this order:
 
-1. **Direct tools (the normal case in Claude Desktop/Cowork).** If tools named
-   `he_*` (e.g. `he_load_persona`, `he_get_calendar`) are available,
-   USE THEM DIRECTLY. Call `he_load_persona` first to adopt the operating
-   instructions, then do the work with the agent's own tools. This is the primary path —
-   never reach for `manage_delegations` when `he_*` tools exist.
-2. **No `he_*` tools yet?** They may be a moment from loading — try once more / a
-   new message. If a generic `manage_delegations` IS available (a Toolbelt-native
-   session) and the `he_*` tools are not, then delegate to assistant id
-   `77503aef-ee54-4144-a4d4-608439f36bbf` via `manage_delegations`.
+> **Tool names depend on how Health-E is connected — match EITHER form:**
+> • **Gateway URL connector (recommended):** tools are **unprefixed** and grouped under the
+>   "Health-E" connector — e.g. `load_persona`, `get_calendar`, `wrench_execute`.
+> • **`.mcpb` install:** the same tools are **prefixed** with the agent's initials —
+>   `he_load_persona`, `he_get_calendar`, `he_wrench_execute`.
+> Below, `load_persona` means "the load_persona tool in whichever form is present." If a
+> request is in Health-E's lane and a `load_persona`/`he_load_persona` tool exists in
+> this chat, that IS Health-E — route to it; don't ask the user which connector to use.
+
+1. **Direct tools (the normal case in Claude Desktop/Cowork).** If Health-E's tools are
+   present in EITHER form above — a `load_persona` (or `he_load_persona`) tool exists —
+   USE THEM DIRECTLY. Call `load_persona` first to adopt the operating instructions, then
+   do the work with the agent's own tools. This is the primary path — never reach for
+   `manage_delegations` when these tools exist.
+2. **No such tools yet?** They may be a moment from loading — try once more / a new
+   message. If a generic `manage_delegations` IS available (a Toolbelt-native session) and
+   Health-E's tools are not, then delegate to assistant id `77503aef-ee54-4144-a4d4-608439f36bbf` via
+   `manage_delegations`.
 3. **Neither available?** The Health-E connector isn't loaded for this chat. Tell
    the user to enable "Health-E" in the "+" → Connectors menu (or install it), and
    stop — don't silently substitute yourself.
 
 Once you have the agent (path 1 or 2):
 
-- BEFORE real work, `he_load_persona` and fully adopt the returned instructions
-  (several agents share services like calendar/email — what differs is their context).
-- Prefer the agent's own tools: `he_wrench_*` are its skills;
-  `he_read_storage_file` / `he_list_storage_files` / `he_grep_storage_file`
-  are its files and memory.
+- BEFORE real work, call `load_persona` (`he_load_persona`) and fully adopt the
+  returned instructions (several agents share services like calendar/email — what differs
+  is their context).
+- Prefer the agent's own tools: the `wrench_*` tools are its skills;
+  `read_storage_file` / `list_storage_files` / `grep_storage_file` (or the `he_`
+  forms) are its files and memory.
 - Answer in the agent's voice and cite what you used.
 
 ## Delegating to OTHER MODELS (sub-chats / Model Auto-Pilot)

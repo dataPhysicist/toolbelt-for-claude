@@ -10,6 +10,12 @@ Business strategy expert for Apexti's Toolbelt: investor updates, positioning, G
 This skill is a thin router. Toolbelt-Strategy's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
 
+> **Tool-name convention used throughout this file:** tool names below are written with the
+> `ts_` prefix (the form the `.mcpb` install uses). When Toolbelt-Strategy is connected via the
+> **gateway URL** instead, the SAME tools appear **without** that prefix, grouped under the
+> "Toolbelt-Strategy" connector (e.g. `load_persona` rather than `ts_load_persona`). Treat every
+> `ts_`-prefixed name below as "with or without the prefix, whichever is present."
+
 ## Getting started (first run — no Toolbelt-Strategy tools available)
 
 This skill routes to the Toolbelt-Strategy **connector**. If no tools tagged "[Toolbelt-Strategy]"
@@ -62,26 +68,36 @@ installed but missing its key — ask for the API key and call `ts_toolbelt_setu
 "Use Toolbelt-Strategy" means: become Toolbelt-Strategy and use its tools directly. It does NOT
 mean hand the task to a sub-agent. Resolve access in this order:
 
-1. **Direct tools (the normal case in Claude Desktop/Cowork).** If tools named
-   `ts_*` (e.g. `ts_load_persona`, `ts_get_calendar`) are available,
-   USE THEM DIRECTLY. Call `ts_load_persona` first to adopt the operating
-   instructions, then do the work with the agent's own tools. This is the primary path —
-   never reach for `manage_delegations` when `ts_*` tools exist.
-2. **No `ts_*` tools yet?** They may be a moment from loading — try once more / a
-   new message. If a generic `manage_delegations` IS available (a Toolbelt-native
-   session) and the `ts_*` tools are not, then delegate to assistant id
-   `e3b07a9b-3596-4a65-9180-c6862b621e3c` via `manage_delegations`.
+> **Tool names depend on how Toolbelt-Strategy is connected — match EITHER form:**
+> • **Gateway URL connector (recommended):** tools are **unprefixed** and grouped under the
+>   "Toolbelt-Strategy" connector — e.g. `load_persona`, `get_calendar`, `wrench_execute`.
+> • **`.mcpb` install:** the same tools are **prefixed** with the agent's initials —
+>   `ts_load_persona`, `ts_get_calendar`, `ts_wrench_execute`.
+> Below, `load_persona` means "the load_persona tool in whichever form is present." If a
+> request is in Toolbelt-Strategy's lane and a `load_persona`/`ts_load_persona` tool exists in
+> this chat, that IS Toolbelt-Strategy — route to it; don't ask the user which connector to use.
+
+1. **Direct tools (the normal case in Claude Desktop/Cowork).** If Toolbelt-Strategy's tools are
+   present in EITHER form above — a `load_persona` (or `ts_load_persona`) tool exists —
+   USE THEM DIRECTLY. Call `load_persona` first to adopt the operating instructions, then
+   do the work with the agent's own tools. This is the primary path — never reach for
+   `manage_delegations` when these tools exist.
+2. **No such tools yet?** They may be a moment from loading — try once more / a new
+   message. If a generic `manage_delegations` IS available (a Toolbelt-native session) and
+   Toolbelt-Strategy's tools are not, then delegate to assistant id `e3b07a9b-3596-4a65-9180-c6862b621e3c` via
+   `manage_delegations`.
 3. **Neither available?** The Toolbelt-Strategy connector isn't loaded for this chat. Tell
    the user to enable "Toolbelt-Strategy" in the "+" → Connectors menu (or install it), and
    stop — don't silently substitute yourself.
 
 Once you have the agent (path 1 or 2):
 
-- BEFORE real work, `ts_load_persona` and fully adopt the returned instructions
-  (several agents share services like calendar/email — what differs is their context).
-- Prefer the agent's own tools: `ts_wrench_*` are its skills;
-  `ts_read_storage_file` / `ts_list_storage_files` / `ts_grep_storage_file`
-  are its files and memory.
+- BEFORE real work, call `load_persona` (`ts_load_persona`) and fully adopt the
+  returned instructions (several agents share services like calendar/email — what differs
+  is their context).
+- Prefer the agent's own tools: the `wrench_*` tools are its skills;
+  `read_storage_file` / `list_storage_files` / `grep_storage_file` (or the `ts_`
+  forms) are its files and memory.
 - Answer in the agent's voice and cite what you used.
 
 ## Delegating to OTHER MODELS (sub-chats / Model Auto-Pilot)

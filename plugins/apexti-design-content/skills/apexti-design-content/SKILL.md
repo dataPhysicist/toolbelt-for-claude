@@ -10,6 +10,12 @@ Apexti's design & content source-of-truth: creates brand-consistent Google Slide
 This skill is a thin router. Apexti-Design-Content's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
 
+> **Tool-name convention used throughout this file:** tool names below are written with the
+> `adc_` prefix (the form the `.mcpb` install uses). When Apexti-Design-Content is connected via the
+> **gateway URL** instead, the SAME tools appear **without** that prefix, grouped under the
+> "Apexti-Design-Content" connector (e.g. `load_persona` rather than `adc_load_persona`). Treat every
+> `adc_`-prefixed name below as "with or without the prefix, whichever is present."
+
 ## Getting started (first run — no Apexti-Design-Content tools available)
 
 This skill routes to the Apexti-Design-Content **connector**. If no tools tagged "[Apexti-Design-Content]"
@@ -62,26 +68,36 @@ installed but missing its key — ask for the API key and call `adc_toolbelt_set
 "Use Apexti-Design-Content" means: become Apexti-Design-Content and use its tools directly. It does NOT
 mean hand the task to a sub-agent. Resolve access in this order:
 
-1. **Direct tools (the normal case in Claude Desktop/Cowork).** If tools named
-   `adc_*` (e.g. `adc_load_persona`, `adc_get_calendar`) are available,
-   USE THEM DIRECTLY. Call `adc_load_persona` first to adopt the operating
-   instructions, then do the work with the agent's own tools. This is the primary path —
-   never reach for `manage_delegations` when `adc_*` tools exist.
-2. **No `adc_*` tools yet?** They may be a moment from loading — try once more / a
-   new message. If a generic `manage_delegations` IS available (a Toolbelt-native
-   session) and the `adc_*` tools are not, then delegate to assistant id
-   `279f3b80-9f2c-441d-a0af-084e84481e36` via `manage_delegations`.
+> **Tool names depend on how Apexti-Design-Content is connected — match EITHER form:**
+> • **Gateway URL connector (recommended):** tools are **unprefixed** and grouped under the
+>   "Apexti-Design-Content" connector — e.g. `load_persona`, `get_calendar`, `wrench_execute`.
+> • **`.mcpb` install:** the same tools are **prefixed** with the agent's initials —
+>   `adc_load_persona`, `adc_get_calendar`, `adc_wrench_execute`.
+> Below, `load_persona` means "the load_persona tool in whichever form is present." If a
+> request is in Apexti-Design-Content's lane and a `load_persona`/`adc_load_persona` tool exists in
+> this chat, that IS Apexti-Design-Content — route to it; don't ask the user which connector to use.
+
+1. **Direct tools (the normal case in Claude Desktop/Cowork).** If Apexti-Design-Content's tools are
+   present in EITHER form above — a `load_persona` (or `adc_load_persona`) tool exists —
+   USE THEM DIRECTLY. Call `load_persona` first to adopt the operating instructions, then
+   do the work with the agent's own tools. This is the primary path — never reach for
+   `manage_delegations` when these tools exist.
+2. **No such tools yet?** They may be a moment from loading — try once more / a new
+   message. If a generic `manage_delegations` IS available (a Toolbelt-native session) and
+   Apexti-Design-Content's tools are not, then delegate to assistant id `279f3b80-9f2c-441d-a0af-084e84481e36` via
+   `manage_delegations`.
 3. **Neither available?** The Apexti-Design-Content connector isn't loaded for this chat. Tell
    the user to enable "Apexti-Design-Content" in the "+" → Connectors menu (or install it), and
    stop — don't silently substitute yourself.
 
 Once you have the agent (path 1 or 2):
 
-- BEFORE real work, `adc_load_persona` and fully adopt the returned instructions
-  (several agents share services like calendar/email — what differs is their context).
-- Prefer the agent's own tools: `adc_wrench_*` are its skills;
-  `adc_read_storage_file` / `adc_list_storage_files` / `adc_grep_storage_file`
-  are its files and memory.
+- BEFORE real work, call `load_persona` (`adc_load_persona`) and fully adopt the
+  returned instructions (several agents share services like calendar/email — what differs
+  is their context).
+- Prefer the agent's own tools: the `wrench_*` tools are its skills;
+  `read_storage_file` / `list_storage_files` / `grep_storage_file` (or the `adc_`
+  forms) are its files and memory.
 - Answer in the agent's voice and cite what you used.
 
 ## Delegating to OTHER MODELS (sub-chats / Model Auto-Pilot)

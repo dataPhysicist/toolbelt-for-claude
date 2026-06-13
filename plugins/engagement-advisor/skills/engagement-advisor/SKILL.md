@@ -10,6 +10,12 @@ HubSpot Engagements-pipeline deal coach: pulls open deals, reviews activity sign
 This skill is a thin router. Engagement-Advisor's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
 
+> **Tool-name convention used throughout this file:** tool names below are written with the
+> `ea_` prefix (the form the `.mcpb` install uses). When Engagement-Advisor is connected via the
+> **gateway URL** instead, the SAME tools appear **without** that prefix, grouped under the
+> "Engagement-Advisor" connector (e.g. `load_persona` rather than `ea_load_persona`). Treat every
+> `ea_`-prefixed name below as "with or without the prefix, whichever is present."
+
 ## Getting started (first run — no Engagement-Advisor tools available)
 
 This skill routes to the Engagement-Advisor **connector**. If no tools tagged "[Engagement-Advisor]"
@@ -62,26 +68,36 @@ installed but missing its key — ask for the API key and call `ea_toolbelt_setu
 "Use Engagement-Advisor" means: become Engagement-Advisor and use its tools directly. It does NOT
 mean hand the task to a sub-agent. Resolve access in this order:
 
-1. **Direct tools (the normal case in Claude Desktop/Cowork).** If tools named
-   `ea_*` (e.g. `ea_load_persona`, `ea_get_calendar`) are available,
-   USE THEM DIRECTLY. Call `ea_load_persona` first to adopt the operating
-   instructions, then do the work with the agent's own tools. This is the primary path —
-   never reach for `manage_delegations` when `ea_*` tools exist.
-2. **No `ea_*` tools yet?** They may be a moment from loading — try once more / a
-   new message. If a generic `manage_delegations` IS available (a Toolbelt-native
-   session) and the `ea_*` tools are not, then delegate to assistant id
-   `08583ebe-041d-4ebe-bc90-706bd7b6c506` via `manage_delegations`.
+> **Tool names depend on how Engagement-Advisor is connected — match EITHER form:**
+> • **Gateway URL connector (recommended):** tools are **unprefixed** and grouped under the
+>   "Engagement-Advisor" connector — e.g. `load_persona`, `get_calendar`, `wrench_execute`.
+> • **`.mcpb` install:** the same tools are **prefixed** with the agent's initials —
+>   `ea_load_persona`, `ea_get_calendar`, `ea_wrench_execute`.
+> Below, `load_persona` means "the load_persona tool in whichever form is present." If a
+> request is in Engagement-Advisor's lane and a `load_persona`/`ea_load_persona` tool exists in
+> this chat, that IS Engagement-Advisor — route to it; don't ask the user which connector to use.
+
+1. **Direct tools (the normal case in Claude Desktop/Cowork).** If Engagement-Advisor's tools are
+   present in EITHER form above — a `load_persona` (or `ea_load_persona`) tool exists —
+   USE THEM DIRECTLY. Call `load_persona` first to adopt the operating instructions, then
+   do the work with the agent's own tools. This is the primary path — never reach for
+   `manage_delegations` when these tools exist.
+2. **No such tools yet?** They may be a moment from loading — try once more / a new
+   message. If a generic `manage_delegations` IS available (a Toolbelt-native session) and
+   Engagement-Advisor's tools are not, then delegate to assistant id `08583ebe-041d-4ebe-bc90-706bd7b6c506` via
+   `manage_delegations`.
 3. **Neither available?** The Engagement-Advisor connector isn't loaded for this chat. Tell
    the user to enable "Engagement-Advisor" in the "+" → Connectors menu (or install it), and
    stop — don't silently substitute yourself.
 
 Once you have the agent (path 1 or 2):
 
-- BEFORE real work, `ea_load_persona` and fully adopt the returned instructions
-  (several agents share services like calendar/email — what differs is their context).
-- Prefer the agent's own tools: `ea_wrench_*` are its skills;
-  `ea_read_storage_file` / `ea_list_storage_files` / `ea_grep_storage_file`
-  are its files and memory.
+- BEFORE real work, call `load_persona` (`ea_load_persona`) and fully adopt the
+  returned instructions (several agents share services like calendar/email — what differs
+  is their context).
+- Prefer the agent's own tools: the `wrench_*` tools are its skills;
+  `read_storage_file` / `list_storage_files` / `grep_storage_file` (or the `ea_`
+  forms) are its files and memory.
 - Answer in the agent's voice and cite what you used.
 
 ## Delegating to OTHER MODELS (sub-chats / Model Auto-Pilot)

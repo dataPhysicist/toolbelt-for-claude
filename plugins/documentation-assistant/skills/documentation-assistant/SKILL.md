@@ -10,6 +10,12 @@ Turns chat explanations into real product documentation — an expert technical 
 This skill is a thin router. Documentation-Assistant's actual instructions, skills, knowledge, and
 memory live in Toolbelt and are always fetched live — never rely on this file for them.
 
+> **Tool-name convention used throughout this file:** tool names below are written with the
+> `da_` prefix (the form the `.mcpb` install uses). When Documentation-Assistant is connected via the
+> **gateway URL** instead, the SAME tools appear **without** that prefix, grouped under the
+> "Documentation-Assistant" connector (e.g. `load_persona` rather than `da_load_persona`). Treat every
+> `da_`-prefixed name below as "with or without the prefix, whichever is present."
+
 ## Getting started (first run — no Documentation-Assistant tools available)
 
 This skill routes to the Documentation-Assistant **connector**. If no tools tagged "[Documentation-Assistant]"
@@ -62,26 +68,36 @@ installed but missing its key — ask for the API key and call `da_toolbelt_setu
 "Use Documentation-Assistant" means: become Documentation-Assistant and use its tools directly. It does NOT
 mean hand the task to a sub-agent. Resolve access in this order:
 
-1. **Direct tools (the normal case in Claude Desktop/Cowork).** If tools named
-   `da_*` (e.g. `da_load_persona`, `da_get_calendar`) are available,
-   USE THEM DIRECTLY. Call `da_load_persona` first to adopt the operating
-   instructions, then do the work with the agent's own tools. This is the primary path —
-   never reach for `manage_delegations` when `da_*` tools exist.
-2. **No `da_*` tools yet?** They may be a moment from loading — try once more / a
-   new message. If a generic `manage_delegations` IS available (a Toolbelt-native
-   session) and the `da_*` tools are not, then delegate to assistant id
-   `390b55c4-4335-4b9b-9f79-97aeafde3052` via `manage_delegations`.
+> **Tool names depend on how Documentation-Assistant is connected — match EITHER form:**
+> • **Gateway URL connector (recommended):** tools are **unprefixed** and grouped under the
+>   "Documentation-Assistant" connector — e.g. `load_persona`, `get_calendar`, `wrench_execute`.
+> • **`.mcpb` install:** the same tools are **prefixed** with the agent's initials —
+>   `da_load_persona`, `da_get_calendar`, `da_wrench_execute`.
+> Below, `load_persona` means "the load_persona tool in whichever form is present." If a
+> request is in Documentation-Assistant's lane and a `load_persona`/`da_load_persona` tool exists in
+> this chat, that IS Documentation-Assistant — route to it; don't ask the user which connector to use.
+
+1. **Direct tools (the normal case in Claude Desktop/Cowork).** If Documentation-Assistant's tools are
+   present in EITHER form above — a `load_persona` (or `da_load_persona`) tool exists —
+   USE THEM DIRECTLY. Call `load_persona` first to adopt the operating instructions, then
+   do the work with the agent's own tools. This is the primary path — never reach for
+   `manage_delegations` when these tools exist.
+2. **No such tools yet?** They may be a moment from loading — try once more / a new
+   message. If a generic `manage_delegations` IS available (a Toolbelt-native session) and
+   Documentation-Assistant's tools are not, then delegate to assistant id `390b55c4-4335-4b9b-9f79-97aeafde3052` via
+   `manage_delegations`.
 3. **Neither available?** The Documentation-Assistant connector isn't loaded for this chat. Tell
    the user to enable "Documentation-Assistant" in the "+" → Connectors menu (or install it), and
    stop — don't silently substitute yourself.
 
 Once you have the agent (path 1 or 2):
 
-- BEFORE real work, `da_load_persona` and fully adopt the returned instructions
-  (several agents share services like calendar/email — what differs is their context).
-- Prefer the agent's own tools: `da_wrench_*` are its skills;
-  `da_read_storage_file` / `da_list_storage_files` / `da_grep_storage_file`
-  are its files and memory.
+- BEFORE real work, call `load_persona` (`da_load_persona`) and fully adopt the
+  returned instructions (several agents share services like calendar/email — what differs
+  is their context).
+- Prefer the agent's own tools: the `wrench_*` tools are its skills;
+  `read_storage_file` / `list_storage_files` / `grep_storage_file` (or the `da_`
+  forms) are its files and memory.
 - Answer in the agent's voice and cite what you used.
 
 ## Delegating to OTHER MODELS (sub-chats / Model Auto-Pilot)
