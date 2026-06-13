@@ -131,15 +131,15 @@ const server = createServer(async (req, res) => {
       if (!client || client.t !== "client" || !client.redirect_uris.includes(f.redirect_uri)) return html(res, 400, "<p>Bad client.</p>");
       const key = (f.api_key || "").trim();
       if (!key) return html(res, 200, PAGE(f, "Please enter an API key."));
-      // Light validation against Toolbelt (don't block on transient failures)
+      // Validate the key against a KEY-ONLY endpoint (lists the user's workspaces). Do NOT
+      // validate against a specific/dummy workspace — a valid key returns 403 for a
+      // workspace it can't access, which would wrongly reject good keys. GET /api/workspaces
+      // accepts apiKeyAuth and needs no workspace, so only 401 means a bad key.
       try {
-        const r = await fetch(`${TOOLBELT}/api/workspaces/00000000-0000-0000-0000-000000000000/mcp`, {
-          method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream", authorization: `Bearer ${key}` },
-          body: JSON.stringify({ jsonrpc: "2.0", id: 0, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "gateway-check", version: "1" } } }),
-        });
-        if (r.status === 401 || r.status === 403) return html(res, 200, PAGE(f, "Toolbelt rejected that key (401/403). Check it and try again."));
+        const r = await fetch(`${TOOLBELT}/api/workspaces`, { headers: { authorization: `Bearer ${key}`, accept: "application/json" } });
+        if (r.status === 401) return html(res, 200, PAGE(f, "Toolbelt rejected that key (401). Get a fresh key from Toolbelt → Settings → Connect to Claude and try again."));
         r.body?.cancel?.().catch?.(() => {});
-      } catch { /* Toolbelt unreachable — accept; first real call will surface it */ }
+      } catch { /* Toolbelt unreachable — accept; the first real MCP call will surface any issue */ }
       const code = seal({ t: "code", k: key, cid: f.client_id.slice(-24), ru: f.redirect_uri, cc: f.code_challenge, exp: Date.now() + 5 * 60 * 1000 });
       const loc = new URL(f.redirect_uri);
       loc.searchParams.set("code", code);
